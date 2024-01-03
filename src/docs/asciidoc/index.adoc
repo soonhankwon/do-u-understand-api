@@ -13,8 +13,13 @@ endif::[]
 
 == 커스텀 에러
 
-= 회원가입 API
-
-== 회원 생성
+= 회원관련 API
 
 include::api/user/create-user.adoc[]
+
+= 지식관련 API
+
+include::api/knowledge/create-knowledge.adoc[]
+include::api/knowledge/get-knowledge.adoc[]
+include::api/knowledge/update-knowledge.adoc[]
+include::api/knowledge/delete-knowledge.adoc[]
