@@ -1,5 +1,5 @@
 ---
-name: Bug
+name: bug
 about: BUG 발생 시 작성해주세요.
 title: "[BUG] 버그 제목"
 labels: bug
