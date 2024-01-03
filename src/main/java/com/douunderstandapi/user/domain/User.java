@@ -7,8 +7,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "`user`")
@@ -27,4 +29,14 @@ public class User {
 
     @Column(name = "is_authenticated", nullable = false)
     private Boolean isAuthenticated;
+
+    private User(String email, String password) {
+        this.email = email;
+        this.password = password;
+        this.isAuthenticated = false;
+    }
+
+    public static User of(String email, String password) {
+        return new User(email, password);
+    }
 }

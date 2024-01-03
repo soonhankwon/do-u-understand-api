@@ -1,0 +1,15 @@
+=== 회원 등록 API
+
+==== 1. Curl Request
+include::{snippets}/create-user/curl-request.adoc[]
+
+==== 2. HTTP Request
+include::{snippets}/create-user/http-request.adoc[]
+
+==== 3. HTTP Request Body
+include::{snippets}/create-user/request-body.adoc[]
+include::{snippets}/create-user/request-fields.adoc[]
+
+==== 4. HTTP Response Body
+include::{snippets}/create-user/response-body.adoc[]
+include::{snippets}/create-user/response-fields.adoc[]
