@@ -1,6 +1,8 @@
 package com.douunderstandapi.user.domain;
 
+import com.douunderstandapi.common.converter.AES256ToStringConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,6 +23,7 @@ public class User {
     @Column(name = "id")
     private Long id;
 
+    @Convert(converter = AES256ToStringConverter.class)
     @Column(name = "email", nullable = false)
     private String email;
 
