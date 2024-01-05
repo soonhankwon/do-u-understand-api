@@ -13,7 +13,7 @@ class UserTest {
     void of() {
         String email = "test@gmail.com";
         String password = "password1!";
-        User user = User.of(email, password);
+        User user = User.of(email, password, true);
 
         assertThat(user.getEmail()).isEqualTo(email);
     }
@@ -23,11 +23,12 @@ class UserTest {
     void getter() {
         String email = "test@gmail.com";
         String password = "password1!";
-        User user = User.of(email, password);
+        User user = User.of(email, password, true);
 
         assertThat(user.getId()).isNull();
         assertThat(user.getPassword()).isEqualTo(password);
         assertThat(user.getEmail()).isEqualTo(email);
         assertThat(user.getIsAuthenticated()).isFalse();
+        assertThat(user.getIsAllowedNotification()).isTrue();
     }
 }

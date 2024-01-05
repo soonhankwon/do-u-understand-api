@@ -37,9 +37,11 @@ class KnowledgeTest {
         assertThat(knowledge.getLink()).isEqualTo(link);
         assertThat(knowledge.getUser()).isSameAs(mockUser);
         assertThat(knowledge.getIsUnderstand()).isFalse();
+        assertThat(knowledge.getIsSubscribe()).isFalse();
+        assertThat(knowledge.getNotificationCount()).isEqualTo(0);
     }
 
     private User createUser() {
-        return User.of("test@gmail.com", "password1!");
+        return User.of("test@gmail.com", "password1!", true);
     }
 }

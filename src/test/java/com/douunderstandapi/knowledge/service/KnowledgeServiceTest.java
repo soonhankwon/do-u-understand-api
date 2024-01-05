@@ -1,4 +1,4 @@
-package com.douunderstandapi.knowledge.application;
+package com.douunderstandapi.knowledge.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -12,9 +12,9 @@ import com.douunderstandapi.knowledge.domain.dto.request.KnowledgeUpdateRequest;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeAddResponse;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeGetResponse;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeUpdateResponse;
-import com.douunderstandapi.knowledge.infrastructure.repository.KnowledgeRepository;
+import com.douunderstandapi.knowledge.repository.KnowledgeRepository;
 import com.douunderstandapi.user.domain.User;
-import com.douunderstandapi.user.infrastructure.repository.UserRepository;
+import com.douunderstandapi.user.repository.UserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -107,6 +107,6 @@ class KnowledgeServiceTest {
     }
 
     private User createUser() {
-        return User.of("test@gmail.com", "password1!");
+        return User.of("test@gmail.com", "password1!", true);
     }
 }

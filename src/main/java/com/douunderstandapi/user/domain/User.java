@@ -30,16 +30,20 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "is_authenticated", nullable = false)
+    @Column(name = "authenticated", nullable = false)
     private Boolean isAuthenticated;
 
-    private User(String email, String password) {
+    @Column(name = "allowed_notification", nullable = false)
+    private Boolean isAllowedNotification;
+
+    private User(String email, String password, Boolean isAllowedNotification) {
         this.email = email;
         this.password = password;
         this.isAuthenticated = false;
+        this.isAllowedNotification = isAllowedNotification;
     }
 
-    public static User of(String email, String password) {
-        return new User(email, password);
+    public static User of(String email, String password, Boolean isAllowedNotification) {
+        return new User(email, password, isAllowedNotification);
     }
 }

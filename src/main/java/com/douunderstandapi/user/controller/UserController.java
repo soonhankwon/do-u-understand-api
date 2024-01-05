@@ -1,8 +1,8 @@
-package com.douunderstandapi.user.presentation;
+package com.douunderstandapi.user.controller;
 
-import com.douunderstandapi.user.application.UserService;
 import com.douunderstandapi.user.domain.dto.request.UserAddRequest;
 import com.douunderstandapi.user.domain.dto.response.UserAddResponse;
+import com.douunderstandapi.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

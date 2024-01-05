@@ -1,11 +1,11 @@
-package com.douunderstandapi.knowledge.presentation;
+package com.douunderstandapi.knowledge.controller;
 
-import com.douunderstandapi.knowledge.application.KnowledgeService;
 import com.douunderstandapi.knowledge.domain.dto.request.KnowledgeAddRequest;
 import com.douunderstandapi.knowledge.domain.dto.request.KnowledgeUpdateRequest;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeAddResponse;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeGetResponse;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeUpdateResponse;
+import com.douunderstandapi.knowledge.service.KnowledgeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

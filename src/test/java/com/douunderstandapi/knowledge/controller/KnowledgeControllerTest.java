@@ -1,4 +1,4 @@
-package com.douunderstandapi.knowledge.presentation;
+package com.douunderstandapi.knowledge.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -15,12 +15,12 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.douunderstandapi.knowledge.application.KnowledgeService;
 import com.douunderstandapi.knowledge.domain.dto.request.KnowledgeAddRequest;
 import com.douunderstandapi.knowledge.domain.dto.request.KnowledgeUpdateRequest;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeAddResponse;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeGetResponse;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeUpdateResponse;
+import com.douunderstandapi.knowledge.service.KnowledgeService;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -135,6 +135,7 @@ class KnowledgeControllerTest {
         request.put("title", "RESTful API 이해하기");
         request.put("content", "Restful API란.....222");
         request.put("link", "https://abcdefssss/2in2/update");
+        request.put("email", "test@gmail.com");
 
         when(knowledgeService.update(any(Long.class), any(KnowledgeUpdateRequest.class)))
                 .thenReturn(createKnowledgeUpdateResponse());
@@ -152,7 +153,8 @@ class KnowledgeControllerTest {
                                 requestFields(
                                         fieldWithPath("title").type(STRING).description("제목"),
                                         fieldWithPath("content").type(STRING).description("컨텐츠"),
-                                        fieldWithPath("link").type(STRING).description("관련링크")
+                                        fieldWithPath("link").type(STRING).description("관련링크"),
+                                        fieldWithPath("email").type(STRING).description("유저 이메일")
                                 ),
                                 responseFields(
                                         fieldWithPath("id")
