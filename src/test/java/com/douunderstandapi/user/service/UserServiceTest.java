@@ -1,4 +1,4 @@
-package com.douunderstandapi.user.application;
+package com.douunderstandapi.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.domain.dto.request.UserAddRequest;
 import com.douunderstandapi.user.domain.dto.response.UserAddResponse;
-import com.douunderstandapi.user.infrastructure.repository.UserRepository;
+import com.douunderstandapi.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,13 +31,13 @@ class UserServiceTest {
         String email = "test@gmail.com";
         String password = "password1!";
 
-        UserAddRequest request = new UserAddRequest(email, password);
+        UserAddRequest request = new UserAddRequest(email, password, true);
         UserAddResponse response = userService.addUser(request);
 
         assertThat(response.email()).isEqualTo(email);
     }
 
     private User createUser() {
-        return User.of("test@gmail.com", "password1!");
+        return User.of("test@gmail.com", "password1!", true);
     }
 }

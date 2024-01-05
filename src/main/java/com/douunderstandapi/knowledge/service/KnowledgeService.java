@@ -1,4 +1,4 @@
-package com.douunderstandapi.knowledge.application;
+package com.douunderstandapi.knowledge.service;
 
 import com.douunderstandapi.common.enumtype.ErrorCode;
 import com.douunderstandapi.common.exception.CustomException;
@@ -8,9 +8,9 @@ import com.douunderstandapi.knowledge.domain.dto.request.KnowledgeUpdateRequest;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeAddResponse;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeGetResponse;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeUpdateResponse;
-import com.douunderstandapi.knowledge.infrastructure.repository.KnowledgeRepository;
+import com.douunderstandapi.knowledge.repository.KnowledgeRepository;
 import com.douunderstandapi.user.domain.User;
-import com.douunderstandapi.user.infrastructure.repository.UserRepository;
+import com.douunderstandapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

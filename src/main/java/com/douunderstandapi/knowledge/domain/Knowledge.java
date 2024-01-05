@@ -38,6 +38,12 @@ public class Knowledge {
     @Column(name = "is_understand", nullable = false)
     private Boolean isUnderstand;
 
+    @Column(name = "is_subscribe", nullable = false)
+    private Boolean isSubscribe;
+
+    @Column(name = "notification_count", nullable = false)
+    private Integer notificationCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -47,6 +53,8 @@ public class Knowledge {
         this.content = content;
         this.link = link;
         this.isUnderstand = false;
+        this.isSubscribe = false;
+        this.notificationCount = 0;
         this.user = user;
     }
 
@@ -55,8 +63,22 @@ public class Knowledge {
     }
 
     public void update(KnowledgeUpdateRequest request) {
+        if (request == null) {
+            return;
+        }
         this.title = request.title();
         this.content = request.content();
         this.link = request.link();
+    }
+
+    public void updateSubscribeStatus(Boolean isSubscribe) {
+        if (isSubscribe == null) {
+            return;
+        }
+        this.isSubscribe = isSubscribe;
+    }
+
+    public void increaseNotificationCount() {
+        this.notificationCount++;
     }
 }

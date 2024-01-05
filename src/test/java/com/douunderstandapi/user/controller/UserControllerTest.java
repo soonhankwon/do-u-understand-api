@@ -1,4 +1,4 @@
-package com.douunderstandapi.user.presentation;
+package com.douunderstandapi.user.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -6,6 +6,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -14,9 +15,9 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.douunderstandapi.user.application.UserService;
 import com.douunderstandapi.user.domain.dto.request.UserAddRequest;
 import com.douunderstandapi.user.domain.dto.response.UserAddResponse;
+import com.douunderstandapi.user.service.UserService;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,6 +46,7 @@ class UserControllerTest {
         JSONObject request = new JSONObject();
         request.put("email", "test@gmail.com");
         request.put("password", "1234");
+        request.put("isAllowedNotification", true);
 
         when(userService.addUser(any(UserAddRequest.class)))
                 .thenReturn(createUserAddResponse());
@@ -61,7 +63,8 @@ class UserControllerTest {
                                 preprocessResponse(prettyPrint()),
                                 requestFields(
                                         fieldWithPath("email").type(STRING).description("이메일"),
-                                        fieldWithPath("password").type(STRING).description("패스워드")
+                                        fieldWithPath("password").type(STRING).description("패스워드"),
+                                        fieldWithPath("isAllowedNotification").type(BOOLEAN).description("알람설정여부")
                                 ),
                                 responseFields(
                                         fieldWithPath("id")
@@ -69,7 +72,10 @@ class UserControllerTest {
                                                 .description("회원 ID"),
                                         fieldWithPath("email")
                                                 .type(STRING)
-                                                .description("이메일")
+                                                .description("이메일"),
+                                        fieldWithPath("isAllowedNotification")
+                                                .type(BOOLEAN)
+                                                .description("알람설정여부")
                                 )
                         )
                 )
@@ -77,6 +83,6 @@ class UserControllerTest {
     }
 
     private UserAddResponse createUserAddResponse() {
-        return UserAddResponse.of(1L, "tester@gmail.com");
+        return UserAddResponse.of(1L, "tester@gmail.com", true);
     }
 }
