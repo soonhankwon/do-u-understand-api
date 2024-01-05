@@ -15,12 +15,13 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.douunderstandapi.knowledge.application.KnowledgeService;
+import com.douunderstandapi.knowledge.controller.KnowledgeController;
 import com.douunderstandapi.knowledge.domain.dto.request.KnowledgeAddRequest;
 import com.douunderstandapi.knowledge.domain.dto.request.KnowledgeUpdateRequest;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeAddResponse;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeGetResponse;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeUpdateResponse;
+import com.douunderstandapi.knowledge.service.KnowledgeService;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

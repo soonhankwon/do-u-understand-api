@@ -13,6 +13,7 @@ import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeAddResponse;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeGetResponse;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeUpdateResponse;
 import com.douunderstandapi.knowledge.repository.KnowledgeRepository;
+import com.douunderstandapi.knowledge.service.KnowledgeService;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.repository.UserRepository;
 import java.util.Optional;
