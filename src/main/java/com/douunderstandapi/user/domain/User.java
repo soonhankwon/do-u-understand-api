@@ -1,6 +1,7 @@
 package com.douunderstandapi.user.domain;
 
 import com.douunderstandapi.common.converter.AES256ToStringConverter;
+import com.douunderstandapi.common.entity.UserBaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "`user`")
-public class User {
+public class User extends UserBaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

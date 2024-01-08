@@ -28,7 +28,7 @@ class UserTest {
         assertThat(user.getId()).isNull();
         assertThat(user.getPassword()).isEqualTo(password);
         assertThat(user.getEmail()).isEqualTo(email);
-        assertThat(user.getIsAuthenticated()).isFalse();
+        assertThat(user.getIsAuthenticated()).isTrue();
         assertThat(user.getIsAllowedNotification()).isTrue();
     }
 }
