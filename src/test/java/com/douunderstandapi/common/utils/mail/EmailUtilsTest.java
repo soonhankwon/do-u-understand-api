@@ -2,6 +2,7 @@ package com.douunderstandapi.common.utils.mail;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.douunderstandapi.common.utils.mail.dto.NotificationEmailDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +18,12 @@ class EmailUtilsTest {
     @DisplayName("Email 전송 테스트")
     void sendSimpleMessage() {
         String email = "sooable@gmail.com";
-        String subject = "subject";
+        String title = "title";
         String content = "content";
         String link = "link";
+        NotificationEmailDTO dto = new NotificationEmailDTO(title, content, link);
 
-        String res = emailUtils.sendSimpleMessage(email, subject, content, link);
-
+        String res = emailUtils.sendKnowledgeNotificationMessage(email, dto);
         assertThat(res).isEqualTo("success");
     }
 }

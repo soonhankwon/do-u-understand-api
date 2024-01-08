@@ -1,10 +1,13 @@
 package com.douunderstandapi.common.utils.mail;
 
+import com.douunderstandapi.common.utils.mail.dto.AuthEmailDTO;
+import com.douunderstandapi.common.utils.mail.dto.NotificationEmailDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalTime;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,9 +29,20 @@ public class EmailUtils {
 
     private final JavaMailSender javaMailSender;
 
-    public String sendSimpleMessage(String targetEmail, String subject, String content, String link) {
+    public String sendEmailAuthMessage(String targetEmail) {
         try {
-            MimeMessage message = createMessage(targetEmail, subject, content, link);
+            AuthEmailDTO dto = AuthEmailDTO.from(EmailUtils::createCode);
+            MimeMessage message = createMessage(targetEmail, dto);
+            javaMailSender.send(message);
+            return dto.code();
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            throw new RuntimeException();
+        }
+    }
+
+    public String sendKnowledgeNotificationMessage(String targetEmail, NotificationEmailDTO dto) {
+        try {
+            MimeMessage message = createMessage(targetEmail, dto);
             javaMailSender.send(message);
             return "success";
         } catch (MessagingException | UnsupportedEncodingException e) {
@@ -36,15 +50,22 @@ public class EmailUtils {
         }
     }
 
-    private MimeMessage createMessage(String targetEmail, String subject, String content, String link)
+    private <T> MimeMessage createMessage(String targetEmail, T t)
             throws MessagingException, UnsupportedEncodingException {
         MimeMessage message = javaMailSender.createMimeMessage();
         // targetEmail 보내는 대상
         message.addRecipients(MimeMessage.RecipientType.TO, targetEmail);
-        message.setSubject(DOMAIN_NAME + " " + subject); //메일 제목
-
-        // 메일 내용 만들기 html text
-        String msg = createMailMessage(subject, content, link);
+        String msg = null;
+        if (t instanceof AuthEmailDTO dto) {
+            message.setSubject(DOMAIN_NAME + " " + dto.title()); //메일 제목
+            // 메일 내용 만들기 html text
+            msg = createAuthEmailMessage(dto.code());
+        }
+        if (t instanceof NotificationEmailDTO dto) {
+            message.setSubject(DOMAIN_NAME + " " + dto.title()); //메일 제목
+            // 메일 내용 만들기 html text
+            msg = createNotificationMailMessage(dto);
+        }
 
         // subtype: html
         message.setText(msg, "utf-8", "html");
@@ -53,15 +74,24 @@ public class EmailUtils {
         return message;
     }
 
-    private String createMailMessage(String subject, String content, String link) {
+    private String createAuthEmailMessage(String code) {
+        return String.format("<html><body style=\"font-family: 'Arial', sans-serif;\">"
+                + "<div style=\"background-color: #F4F4F4; padding: 30px; border-radius: 10px;\">"
+                + "<h1 style=\"font-size: 24px; color: #333;\">[회원가입 인증 코드]%s</h1>"
+                + "<p style=\"font-size: 16px; color: #666;\">아래 인증번호를 확인해주세요.</p>"
+                + "%s"
+                + "</td></tr></tbody></table></div></body></html>", DOMAIN_NAME, code);
+    }
+
+    private String createNotificationMailMessage(NotificationEmailDTO dto) {
         LocalTime now = LocalTime.now();
         String timeTextNow = findTimeTextByLocalTimeNow(now);
         String msg = "<html><body style=\"font-family: 'Arial', sans-serif;\">";
         msg += "<div style=\"background-color: #F4F4F4; padding: 30px; border-radius: 10px;\">";
-        msg += "<h1 style=\"font-size: 24px; color: #333;\">" + "[" + timeTextNow + "]" + subject + "</h1>";
-        msg += "<p style=\"font-size: 16px; color: #666;\">" + content + "</p>";
+        msg += "<h1 style=\"font-size: 24px; color: #333;\">" + "[" + timeTextNow + "]" + dto.title() + "</h1>";
+        msg += "<p style=\"font-size: 16px; color: #666;\">" + dto.content() + "</p>";
         msg += "<p style=\"font-size: 16px; color: #666;\">아래 관련 링크에서 컨텐츠를 확인해보세요.</p>";
-        msg += "<div style=\"margin-top: 20px;\"><a href=\"" + link
+        msg += "<div style=\"margin-top: 20px;\"><a href=\"" + dto.link()
                 + "\" style=\"display: inline-block; padding: 12px 24px; background-color: #007BFF; color: #fff; text-decoration: none; border-radius: 5px;\">컨텐츠 확인하기</a></div>";
         msg += "</div></body></html>";
         return msg;
@@ -75,5 +105,9 @@ public class EmailUtils {
         } else {
             return EVENING;
         }
+    }
+
+    private static String createCode() {
+        return UUID.randomUUID().toString();
     }
 }

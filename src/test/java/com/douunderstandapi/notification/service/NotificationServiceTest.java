@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.douunderstandapi.common.utils.mail.EmailUtils;
+import com.douunderstandapi.common.utils.mail.dto.NotificationEmailDTO;
 import com.douunderstandapi.knowledge.domain.Knowledge;
 import com.douunderstandapi.knowledge.repository.KnowledgeRepository;
 import com.douunderstandapi.user.domain.User;
@@ -47,7 +48,7 @@ class NotificationServiceTest {
                 .thenReturn(users);
         when(knowledgeRepository.findAllByUserAndIsSubscribe(any(User.class), anyBoolean()))
                 .thenReturn(knowledges);
-        when(emailUtils.sendSimpleMessage(anyString(), anyString(), anyString(), anyString()))
+        when(emailUtils.sendKnowledgeNotificationMessage(anyString(), any(NotificationEmailDTO.class)))
                 .thenReturn("success");
 
         notificationService.sendUnderstandNotificationInMorning();
@@ -65,7 +66,7 @@ class NotificationServiceTest {
                 .thenReturn(users);
         when(knowledgeRepository.findAllByUserAndIsSubscribe(any(User.class), anyBoolean()))
                 .thenReturn(knowledges);
-        when(emailUtils.sendSimpleMessage(anyString(), anyString(), anyString(), anyString()))
+        when(emailUtils.sendKnowledgeNotificationMessage(anyString(), any(NotificationEmailDTO.class)))
                 .thenReturn("success");
 
         notificationService.sendUnderstandNotificationInEvening();
@@ -83,7 +84,7 @@ class NotificationServiceTest {
                 .thenReturn(users);
         when(knowledgeRepository.findAllByUserAndIsSubscribe(any(User.class), anyBoolean()))
                 .thenReturn(knowledges);
-        when(emailUtils.sendSimpleMessage(anyString(), anyString(), anyString(), anyString()))
+        when(emailUtils.sendKnowledgeNotificationMessage(anyString(), any(NotificationEmailDTO.class)))
                 .thenReturn("success");
 
         notificationService.sendUnderstandNotificationInAfternoon();

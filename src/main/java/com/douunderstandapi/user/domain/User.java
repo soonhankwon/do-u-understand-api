@@ -39,7 +39,7 @@ public class User {
     private User(String email, String password, Boolean isAllowedNotification) {
         this.email = email;
         this.password = password;
-        this.isAuthenticated = false;
+        this.isAuthenticated = true;
         this.isAllowedNotification = isAllowedNotification;
     }
 

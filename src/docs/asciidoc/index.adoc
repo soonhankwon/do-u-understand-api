@@ -16,6 +16,7 @@ endif::[]
 = 회원관련 API
 
 include::api/user/create-user.adoc[]
+include::api/user/auth-user-email.adoc[]
 
 = 지식관련 API
 
