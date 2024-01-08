@@ -8,6 +8,9 @@ import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.domain.dto.request.UserAddRequest;
 import com.douunderstandapi.user.domain.dto.response.UserAddResponse;
 import com.douunderstandapi.user.repository.UserRepository;
+import com.douunderstandapi.user.repository.redis.UserEmailAuthCodeRepository;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,14 +27,21 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
+    @Mock
+    private UserEmailAuthCodeRepository userEmailAuthCodeRepository;
+
     @Test
     @DisplayName("유저 가입 - 서비스 로직 테스트")
     void addUser() {
-        when(userRepository.save(any(User.class))).thenReturn(createUser());
+        String code = UUID.randomUUID().toString();
         String email = "test@gmail.com";
         String password = "password1!";
 
-        UserAddRequest request = new UserAddRequest(email, password, true);
+        when(userRepository.save(any(User.class))).thenReturn(createUser());
+        when(userEmailAuthCodeRepository.get(email)).thenReturn(
+                Optional.of(code));
+
+        UserAddRequest request = new UserAddRequest(email, password, code, true);
         UserAddResponse response = userService.addUser(request);
 
         assertThat(response.email()).isEqualTo(email);

@@ -1,6 +1,7 @@
 package com.douunderstandapi.notification.service;
 
 import com.douunderstandapi.common.utils.mail.EmailUtils;
+import com.douunderstandapi.common.utils.mail.dto.NotificationEmailDTO;
 import com.douunderstandapi.knowledge.domain.Knowledge;
 import com.douunderstandapi.knowledge.repository.KnowledgeRepository;
 import com.douunderstandapi.user.domain.User;
@@ -61,7 +62,6 @@ public class NotificationService {
     }
 
     private void sendEmail(User user, Knowledge knowledge) {
-        emailUtils.sendSimpleMessage(user.getEmail(), knowledge.getTitle(), knowledge.getContent(),
-                knowledge.getLink());
+        emailUtils.sendKnowledgeNotificationMessage(user.getEmail(), NotificationEmailDTO.from(knowledge));
     }
 }
