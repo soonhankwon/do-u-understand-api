@@ -1,6 +1,7 @@
 package com.douunderstandapi.knowledge.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -11,9 +12,11 @@ import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.douunderstandapi.annotation.WithUserPrincipals;
 import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeSubscribeUpdateResponse;
 import com.douunderstandapi.knowledge.service.KnowledgeSubscribeService;
 import org.junit.jupiter.api.DisplayName;
@@ -37,13 +40,15 @@ class KnowledgeSubscribeControllerTest {
     private KnowledgeSubscribeService knowledgeSubscribeService;
 
     @DisplayName("{PATCH} 지식구독 업데이트 - 정상호출")
+    @WithUserPrincipals
     @Test
     void updateKnowledgeSubscribe() throws Exception {
-        when(knowledgeSubscribeService.updateKnowledgeSubscribe(any(Long.class), any(Boolean.class)))
+        when(knowledgeSubscribeService.updateKnowledgeSubscribe(anyString(), any(Long.class), any(Boolean.class)))
                 .thenReturn(createKnowledgeSubscribeUpdateResponseResponse());
 
         mvc.perform(
                         RestDocumentationRequestBuilders.patch("/api/v1/knowledge/1")
+                                .with(csrf().asHeader())
                                 .param("isSubscribe", "true"))
                 .andDo(print())
                 .andDo(

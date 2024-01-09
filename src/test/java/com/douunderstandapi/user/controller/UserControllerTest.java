@@ -12,9 +12,11 @@ import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.douunderstandapi.annotation.WithUserPrincipals;
 import com.douunderstandapi.user.domain.dto.request.UserAddRequest;
 import com.douunderstandapi.user.domain.dto.request.UserEmailAuthRequest;
 import com.douunderstandapi.user.domain.dto.response.UserAddResponse;
@@ -43,6 +45,7 @@ class UserControllerTest {
     private UserService userService;
 
     @DisplayName("{POST} 회원등록 - 정상호출")
+    @WithUserPrincipals
     @Test
     void addUser() throws Exception {
         JSONObject request = new JSONObject();
@@ -56,6 +59,7 @@ class UserControllerTest {
 
         mvc.perform(
                         RestDocumentationRequestBuilders.post("/api/v1/users")
+                                .with(csrf().asHeader())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(request.toString()))
                 .andDo(print())
@@ -87,6 +91,7 @@ class UserControllerTest {
     }
 
     @DisplayName("{POST} 이메일 인증요청 - 정상호출")
+    @WithUserPrincipals
     @Test
     void authUserEmail() throws Exception {
         JSONObject request = new JSONObject();
@@ -97,6 +102,7 @@ class UserControllerTest {
 
         mvc.perform(
                         RestDocumentationRequestBuilders.post("/api/v1/users/auth-email")
+                                .with(csrf().asHeader())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(request.toString()))
                 .andDo(print())
