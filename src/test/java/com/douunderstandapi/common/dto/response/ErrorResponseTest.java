@@ -52,4 +52,16 @@ class ErrorResponseTest {
         assertThat(badRequest.code()).isEqualTo(code);
         assertThat(badRequest.msg()).isEqualTo(msg);
     }
+
+    @Test
+    void to_string() {
+        int code = 400;
+        String msg = "Bad Request";
+        String response = ErrorResponse.builder()
+                .code(code)
+                .msg(msg)
+                .toString();
+
+        assertThat(response).contains(msg);
+    }
 }
