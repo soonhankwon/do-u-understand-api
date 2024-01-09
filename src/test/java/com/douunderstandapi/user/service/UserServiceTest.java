@@ -2,6 +2,7 @@ package com.douunderstandapi.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.douunderstandapi.user.domain.User;
@@ -17,12 +18,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserService userService;
@@ -37,6 +42,7 @@ class UserServiceTest {
         String email = "test@gmail.com";
         String password = "password1!";
 
+        when(passwordEncoder.encode(anyString())).thenReturn(password);
         when(userRepository.save(any(User.class))).thenReturn(createUser());
         when(userEmailAuthCodeRepository.get(email)).thenReturn(
                 Optional.of(code));

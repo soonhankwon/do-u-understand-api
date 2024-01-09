@@ -17,4 +17,19 @@ public record ErrorResponse(int code, String msg) {
                         .msg(errorCode.getMsg())
                         .build());
     }
+
+    public static ResponseEntity<ErrorResponse> toResponseEntity(ErrorCode code) {
+        return ResponseEntity.status(500)
+                .body(ErrorResponse.builder()
+                        .code(code.getCode())
+                        .msg(code.getMsg())
+                        .build());
+    }
+
+    public static ErrorResponse from(CustomException ex) {
+        return ErrorResponse.builder()
+                .code(ex.getErrorCode().getCode())
+                .msg(ex.getErrorCode().getMsg())
+                .build();
+    }
 }

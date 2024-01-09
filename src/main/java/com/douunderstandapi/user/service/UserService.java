@@ -12,6 +12,7 @@ import com.douunderstandapi.user.repository.UserRepository;
 import com.douunderstandapi.user.repository.redis.UserEmailAuthCodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final EmailUtils emailUtils;
     private final UserEmailAuthCodeRepository userEmailAuthCodeRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserAddResponse addUser(UserAddRequest request) {
@@ -31,18 +33,19 @@ public class UserService {
             throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_AUTH_CODE);
         }
         // Redis Cache 에서 인증코드를 찾고 없다면 exception
+        String email = request.email();
         String code = userEmailAuthCodeRepository
-                .get(request.email())
+                .get(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_AUTH_CODE));
 
         if (!inputCode.equals(code)) {
             throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_AUTH_CODE);
         }
 
-        User user = request.toEntity();
+        User user = request.toEntity(passwordEncoder::encode);
         userRepository.save(user);
         // user 저장 후 캐시 삭제
-        userEmailAuthCodeRepository.delete(code);
+        userEmailAuthCodeRepository.delete(email);
         return UserAddResponse.from(user);
     }
 

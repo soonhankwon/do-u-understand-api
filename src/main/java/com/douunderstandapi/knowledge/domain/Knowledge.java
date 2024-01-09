@@ -1,5 +1,7 @@
 package com.douunderstandapi.knowledge.domain;
 
+import com.douunderstandapi.common.enumtype.ErrorCode;
+import com.douunderstandapi.common.exception.CustomException;
 import com.douunderstandapi.knowledge.domain.dto.request.KnowledgeUpdateRequest;
 import com.douunderstandapi.user.domain.User;
 import jakarta.persistence.Column;
@@ -14,6 +16,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -80,5 +83,11 @@ public class Knowledge {
 
     public void increaseNotificationCount() {
         this.notificationCount++;
+    }
+
+    public void validateAccessAuth(User user) {
+        if (this.user != user) {
+            throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.NO_AUTH_ACCESS);
+        }
     }
 }

@@ -24,9 +24,9 @@ public class KnowledgeService {
     private final KnowledgeRepository knowledgeRepository;
     private final UserRepository userRepository;
 
-    public KnowledgeAddResponse addKnowledge(KnowledgeAddRequest request) {
+    public KnowledgeAddResponse addKnowledge(String email, KnowledgeAddRequest request) {
         User user = userRepository
-                .findByEmail(request.email())
+                .findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
         Knowledge knowledge = request.toEntity(user);
@@ -36,29 +36,46 @@ public class KnowledgeService {
     }
 
     @Transactional(readOnly = true)
-    public KnowledgeGetResponse findKnowledge(Long knowledgeId) {
+    public KnowledgeGetResponse findKnowledge(String email, Long knowledgeId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
+
         Knowledge knowledge = knowledgeRepository
                 .findById(knowledgeId)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_KNOWLEDGE_ID));
+
+        // 자신이 작성한 지식이 아니라면 조회 거부
+        knowledge.validateAccessAuth(user);
 
         return KnowledgeGetResponse.from(knowledge);
     }
 
-    public KnowledgeUpdateResponse update(Long knowledgeId, KnowledgeUpdateRequest request) {
+    public KnowledgeUpdateResponse update(String email, Long knowledgeId, KnowledgeUpdateRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
+
         Knowledge knowledge = knowledgeRepository
                 .findById(knowledgeId)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_KNOWLEDGE_ID));
 
+        // 자신이 작성한 지식이 아니라면 업데이트 거부
+        knowledge.validateAccessAuth(user);
         knowledge.update(request);
         return KnowledgeUpdateResponse.from(knowledge);
     }
 
-    public String delete(Long knowledgeId) {
+    public String delete(String email, Long knowledgeId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
+
         Knowledge knowledge = knowledgeRepository
                 .findById(knowledgeId)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_KNOWLEDGE_ID));
 
+        // 자신이 작성한 지식이 아니라면 삭제 거부
+        knowledge.validateAccessAuth(user);
         knowledgeRepository.delete(knowledge);
+
         return "deleted";
     }
 }
