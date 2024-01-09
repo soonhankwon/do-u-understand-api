@@ -15,10 +15,14 @@ public enum ErrorCode {
     CRYPTOGRAPHY_FAILED(4004, "암복호화에 실패하였습니다"),
     NOT_EXIST_AUTH_CODE(4005, "해당 이메일의 인증코드가 존재하지 않습니다."),
     INVALID_AUTH_CODE(4006, "유효하지 않은 인증코드 입니다."),
+    NOT_MATCHED_EMAIL_AND_PASSWORD(4007, "이메일과 패스워드가 일치하지 않습니다."),
+    INVALID_TOKEN(4008, "유효한 토큰이 아닙니다."),
+    LOGIN_REQUIRED_FIRST(4009, "로그인이 필요합니다."),
+    NO_AUTH_ACCESS(4010, "접근할 수 있는 권한이 없습니다."),
 
     //500
-    UNKNOWN(5000, "서버 내부 에러가 발생했습니다.");
-
+    UNKNOWN(5000, "서버 내부 에러가 발생했습니다."),
+    REDIS_CONNECTION_DOWN(5001, "레디스 서버가 다운된 상태입니다.");
     private final int code;
     private final String msg;
 }

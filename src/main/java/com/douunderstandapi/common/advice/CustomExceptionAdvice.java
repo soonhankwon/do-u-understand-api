@@ -4,6 +4,7 @@ import com.douunderstandapi.common.dto.response.ErrorResponse;
 import com.douunderstandapi.common.enumtype.ErrorCode;
 import com.douunderstandapi.common.exception.CustomException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -22,5 +23,16 @@ public class CustomExceptionAdvice {
                 )
         );
         return ErrorResponse.toResponseEntity(ex);
+    }
+
+    @ExceptionHandler(RedisConnectionFailureException.class)
+    protected ResponseEntity<ErrorResponse> handleRedisConnectionException(RedisConnectionFailureException ex) {
+        log.warn(
+                String.format(
+                        "http-status={%d} msg={%s}",
+                        500, ex.getMessage()
+                )
+        );
+        return ErrorResponse.toResponseEntity(ErrorCode.REDIS_CONNECTION_DOWN);
     }
 }

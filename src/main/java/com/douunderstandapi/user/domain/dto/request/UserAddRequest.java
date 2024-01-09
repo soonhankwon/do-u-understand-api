@@ -1,6 +1,7 @@
 package com.douunderstandapi.user.domain.dto.request;
 
 import com.douunderstandapi.user.domain.User;
+import java.util.function.Function;
 
 public record UserAddRequest(
         String email,
@@ -9,7 +10,7 @@ public record UserAddRequest(
         Boolean isAllowedNotification
 ) {
 
-    public User toEntity() {
-        return User.of(email, password, isAllowedNotification);
+    public User toEntity(Function<String, String> encodedFunction) {
+        return User.of(email, encodedFunction.apply(this.password), isAllowedNotification);
     }
 }

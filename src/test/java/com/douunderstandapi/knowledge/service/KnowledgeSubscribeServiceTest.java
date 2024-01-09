@@ -1,13 +1,15 @@
 package com.douunderstandapi.knowledge.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import com.douunderstandapi.common.exception.CustomException;
 import com.douunderstandapi.knowledge.domain.Knowledge;
-import com.douunderstandapi.knowledge.domain.dto.response.KnowledgeSubscribeUpdateResponse;
 import com.douunderstandapi.knowledge.repository.KnowledgeRepository;
 import com.douunderstandapi.user.domain.User;
+import com.douunderstandapi.user.repository.UserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,18 +24,22 @@ class KnowledgeSubscribeServiceTest {
     @Mock
     private KnowledgeRepository knowledgeRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     private KnowledgeSubscribeService knowledgeSubscribeService;
 
     @Test
     @DisplayName("지식 구독 업데이트 - 서비스 로직 테스트")
     void updateKnowledgeSubscribe() {
+        String email = "test@gmail.com";
         when(knowledgeRepository.findById(any(Long.class))).thenReturn(Optional.of(createKnowledge()));
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(createUser()));
 
-        KnowledgeSubscribeUpdateResponse response = knowledgeSubscribeService.updateKnowledgeSubscribe(
-                1L, true);
-
-        assertThat(response.isSubscribe()).isTrue();
+        assertThatThrownBy(() -> knowledgeSubscribeService.updateKnowledgeSubscribe(
+                email, 1L, true))
+                .isInstanceOf(CustomException.class);
     }
 
     private Knowledge createKnowledge() {
