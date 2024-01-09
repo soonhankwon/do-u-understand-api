@@ -22,6 +22,16 @@ class AES256ToStringConverterTest {
     }
 
     @Test
+    @DisplayName("DB 데이터 컬럼으로 암호화 테스트 - attribute 텍스트가 없는 경우")
+    void convertToDatabaseColumn_attribute_has_not_text() {
+        String attribute = "";
+        AES256ToStringConverter converter = new AES256ToStringConverter();
+        String encodedAttribute = converter.convertToDatabaseColumn(attribute);
+
+        assertThat(encodedAttribute).isEqualTo(attribute);
+    }
+
+    @Test
     @DisplayName("DB 데이터를 애플리케이션 엔티티 프로퍼티로 복호화 테스트")
     void convertToEntityAttribute() {
         String attribute = "test@gmail.com";
@@ -29,5 +39,14 @@ class AES256ToStringConverterTest {
         String decodedAttribute = converter.convertToEntityAttribute("H7ATa07P3z6BYWv4eVEAwg==");
 
         assertThat(decodedAttribute).isEqualTo(attribute);
+    }
+
+    @Test
+    @DisplayName("DB 데이터를 애플리케이션 엔티티 프로퍼티로 복호화 테스트 - attribute null")
+    void convertToEntityAttribute_null() {
+        AES256ToStringConverter converter = new AES256ToStringConverter();
+        String decodedAttribute = converter.convertToEntityAttribute(null);
+
+        assertThat(decodedAttribute).isNull();
     }
 }
