@@ -9,8 +9,8 @@ import static org.mockito.Mockito.when;
 
 import com.douunderstandapi.common.utils.mail.EmailUtils;
 import com.douunderstandapi.common.utils.mail.dto.NotificationEmailDTO;
-import com.douunderstandapi.knowledge.domain.Knowledge;
-import com.douunderstandapi.knowledge.repository.KnowledgeRepository;
+import com.douunderstandapi.post.domain.Post;
+import com.douunderstandapi.post.repository.PostRepository;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.repository.UserRepository;
 import java.util.List;
@@ -26,7 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class NotificationServiceTest {
 
     @Mock
-    private KnowledgeRepository knowledgeRepository;
+    private PostRepository postRepository;
 
     @Mock
     private UserRepository userRepository;
@@ -42,12 +42,12 @@ class NotificationServiceTest {
     @DisplayName("지식 알람 - 서비스 로직 테스트(아침)")
     void sendUnderstandNotificationInMorning() {
         List<User> users = List.of(createUser());
-        List<Knowledge> knowledges = List.of(createKnowledge());
+        List<Post> posts = List.of(createKnowledge());
 
         when(userRepository.findAllByIsAllowedNotification(anyBoolean()))
                 .thenReturn(users);
-        when(knowledgeRepository.findAllByUserAndIsSubscribe(any(User.class), anyBoolean()))
-                .thenReturn(knowledges);
+        when(postRepository.findAllByUserAndIsSubscribe(any(User.class), anyBoolean()))
+                .thenReturn(posts);
         when(emailUtils.sendKnowledgeNotificationMessage(anyString(), any(NotificationEmailDTO.class)))
                 .thenReturn("success");
 
@@ -60,12 +60,12 @@ class NotificationServiceTest {
     @DisplayName("지식 알람 - 서비스 로직 테스트(점심)")
     void sendUnderstandNotificationInAfternoon() {
         List<User> users = List.of(createUser());
-        List<Knowledge> knowledges = List.of(createKnowledge());
+        List<Post> posts = List.of(createKnowledge());
 
         when(userRepository.findAllByIsAllowedNotification(anyBoolean()))
                 .thenReturn(users);
-        when(knowledgeRepository.findAllByUserAndIsSubscribe(any(User.class), anyBoolean()))
-                .thenReturn(knowledges);
+        when(postRepository.findAllByUserAndIsSubscribe(any(User.class), anyBoolean()))
+                .thenReturn(posts);
         when(emailUtils.sendKnowledgeNotificationMessage(anyString(), any(NotificationEmailDTO.class)))
                 .thenReturn("success");
 
@@ -78,12 +78,12 @@ class NotificationServiceTest {
     @DisplayName("지식 알람 - 서비스 로직 테스트(저녁)")
     void sendUnderstandNotificationInEvening() {
         List<User> users = List.of(createUser());
-        List<Knowledge> knowledges = List.of(createKnowledge());
+        List<Post> posts = List.of(createKnowledge());
 
         when(userRepository.findAllByIsAllowedNotification(anyBoolean()))
                 .thenReturn(users);
-        when(knowledgeRepository.findAllByUserAndIsSubscribe(any(User.class), anyBoolean()))
-                .thenReturn(knowledges);
+        when(postRepository.findAllByUserAndIsSubscribe(any(User.class), anyBoolean()))
+                .thenReturn(posts);
         when(emailUtils.sendKnowledgeNotificationMessage(anyString(), any(NotificationEmailDTO.class)))
                 .thenReturn("success");
 
@@ -92,8 +92,8 @@ class NotificationServiceTest {
         verify(notificationService, times(1)).sendUnderstandNotificationInAfternoon();
     }
 
-    private Knowledge createKnowledge() {
-        return Knowledge.of("함수 네이밍 룰 컨벤션",
+    private Post createKnowledge() {
+        return Post.of("함수 네이밍 룰 컨벤션",
                 "GET 요청을 처리하는 메서드의 네이밍 규칭......",
                 "https://sdnksnd/sds123", createUser());
     }

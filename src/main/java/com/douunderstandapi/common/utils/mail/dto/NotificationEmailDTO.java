@@ -1,16 +1,16 @@
 package com.douunderstandapi.common.utils.mail.dto;
 
-import com.douunderstandapi.knowledge.domain.Knowledge;
+import com.douunderstandapi.post.domain.Post;
 
 public record NotificationEmailDTO(
         String title,
         String content,
         String link
 ) {
-    public static NotificationEmailDTO from(Knowledge knowledge) {
+    public static NotificationEmailDTO from(Post post) {
         return new NotificationEmailDTO(
-                knowledge.getTitle(),
-                knowledge.getContent(),
-                knowledge.getLink());
+                post.getTitle(),
+                post.getContent(),
+                post.getLink());
     }
 }
