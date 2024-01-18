@@ -6,6 +6,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import com.douunderstandapi.auth.dto.request.AuthEmailRequest;
+import com.douunderstandapi.auth.dto.response.AuthEmailResponse;
+import com.douunderstandapi.auth.repository.redis.AuthEmailCodeRepository;
+import com.douunderstandapi.auth.service.AuthService;
 import com.douunderstandapi.common.utils.mail.EmailUtils;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.dto.request.UserAddRequest;
@@ -13,7 +17,6 @@ import com.douunderstandapi.user.dto.response.UserAddResponse;
 import com.douunderstandapi.user.dto.response.UserDeleteResponse;
 import com.douunderstandapi.user.enumType.UserStatus;
 import com.douunderstandapi.user.repository.UserRepository;
-import com.douunderstandapi.user.repository.redis.UserEmailAuthCodeRepository;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -34,13 +37,16 @@ class UserServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private UserEmailAuthCodeRepository userEmailAuthCodeRepository;
+    private AuthEmailCodeRepository authEmailCodeRepository;
 
     @Mock
     private EmailUtils emailUtils;
 
     @InjectMocks
     private UserService userService;
+
+    @InjectMocks
+    private AuthService authService;
 
     @Test
     @DisplayName("유저 가입 - 서비스 로직 테스트")
@@ -51,7 +57,7 @@ class UserServiceTest {
 
         when(passwordEncoder.encode(anyString())).thenReturn(password);
         when(userRepository.save(any(User.class))).thenReturn(createUser());
-        when(userEmailAuthCodeRepository.get(email)).thenReturn(
+        when(authEmailCodeRepository.get(email)).thenReturn(
                 Optional.of(code));
 
         UserAddRequest request = new UserAddRequest(email, password, code, true);
@@ -67,10 +73,10 @@ class UserServiceTest {
         String email = "test@gmail.com";
 
         when(emailUtils.sendEmailAuthMessage(anyString())).thenReturn(code);
-        doNothing().when(userEmailAuthCodeRepository).put(anyString(), anyString());
+        doNothing().when(authEmailCodeRepository).put(anyString(), anyString());
 
-        UserEmailAuthRequest request = new UserEmailAuthRequest(email);
-        UserEmailAuthResponse response = userService.authUserEmail(request);
+        AuthEmailRequest request = new AuthEmailRequest(email);
+        AuthEmailResponse response = authService.authEmail(request);
 
         assertThat(response.code()).isEqualTo(code);
     }
