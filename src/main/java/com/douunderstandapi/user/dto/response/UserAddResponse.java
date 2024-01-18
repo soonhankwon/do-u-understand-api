@@ -1,4 +1,4 @@
-package com.douunderstandapi.user.domain.dto.response;
+package com.douunderstandapi.user.dto.response;
 
 import com.douunderstandapi.user.domain.User;
 

@@ -1,4 +1,4 @@
-package com.douunderstandapi.user.domain.dto.request;
+package com.douunderstandapi.user.dto.request;
 
 import com.douunderstandapi.user.domain.User;
 import java.util.function.Function;
