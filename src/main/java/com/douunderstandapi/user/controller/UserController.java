@@ -1,13 +1,15 @@
 package com.douunderstandapi.user.controller;
 
-import com.douunderstandapi.user.domain.dto.request.UserAddRequest;
-import com.douunderstandapi.user.domain.dto.request.UserEmailAuthRequest;
-import com.douunderstandapi.user.domain.dto.response.UserAddResponse;
-import com.douunderstandapi.user.domain.dto.response.UserEmailAuthResponse;
+import com.douunderstandapi.common.security.impl.UserDetailsImpl;
+import com.douunderstandapi.user.dto.request.UserAddRequest;
+import com.douunderstandapi.user.dto.response.UserAddResponse;
+import com.douunderstandapi.user.dto.response.UserDeleteResponse;
 import com.douunderstandapi.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,10 +28,10 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // 회원가입시 이메일인증 번호 확인 후 가입 엔드포인트에 유효한 인증번호를 입력해야 정상 가입 가능
-    @PostMapping("/auth-email")
-    public ResponseEntity<UserEmailAuthResponse> authUserEmail(@RequestBody UserEmailAuthRequest request) {
-        UserEmailAuthResponse response = userService.authUserEmail(request);
+    @PatchMapping("/delete")
+    public ResponseEntity<?> deleteUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String email = userDetails.getUsername();
+        UserDeleteResponse response = userService.deleteUser(email);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
