@@ -1,0 +1,19 @@
+=== 포스트 업데이트 API
+
+==== 1. Curl Request
+
+include::{snippets}/update-post/curl-request.adoc[]
+
+==== 2. HTTP Request
+
+include::{snippets}/update-post/http-request.adoc[]
+
+==== 3. HTTP Request Body
+
+include::{snippets}/update-post/request-body.adoc[]
+include::{snippets}/update-post/request-fields.adoc[]
+
+==== 4. HTTP Response Body
+
+include::{snippets}/update-post/response-body.adoc[]
+include::{snippets}/update-post/response-fields.adoc[]
