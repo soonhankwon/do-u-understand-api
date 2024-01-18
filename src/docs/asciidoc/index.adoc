@@ -13,14 +13,15 @@ endif::[]
 
 == 커스텀 에러
 
-= 회원관련 API
+= 회원 관련 API
 
 include::api/user/create-user.adoc[]
 include::api/user/auth-user-email.adoc[]
+include::api/user/delete-user.adoc[]
 
-= 지식관련 API
+= 포스트 관련 API
 
-include::api/knowledge/create-knowledge.adoc[]
-include::api/knowledge/get-knowledge.adoc[]
-include::api/knowledge/update-knowledge.adoc[]
-include::api/knowledge/delete-knowledge.adoc[]
+include::api/post/create-post.adoc[]
+include::api/post/get-post.adoc[]
+include::api/post/update-post.adoc[]
+include::api/post/delete-post.adoc[]

@@ -1,0 +1,19 @@
+=== 포스트 등록 API
+
+==== 1. Curl Request
+
+include::{snippets}/create-post/curl-request.adoc[]
+
+==== 2. HTTP Request
+
+include::{snippets}/create-post/http-request.adoc[]
+
+==== 3. HTTP Request Body
+
+include::{snippets}/create-post/request-body.adoc[]
+include::{snippets}/create-post/request-fields.adoc[]
+
+==== 4. HTTP Response Body
+
+include::{snippets}/create-post/response-body.adoc[]
+include::{snippets}/create-post/response-fields.adoc[]

@@ -1,0 +1,17 @@
+=== 포스트 삭제 API
+
+==== 1. Curl Request
+
+include::{snippets}/delete-post/curl-request.adoc[]
+
+==== 2. HTTP Request
+
+include::{snippets}/delete-post/http-request.adoc[]
+
+==== 3. HTTP Request Body
+
+include::{snippets}/delete-post/request-body.adoc[]
+
+==== 4. HTTP Response Body
+
+include::{snippets}/delete-post/response-body.adoc[]

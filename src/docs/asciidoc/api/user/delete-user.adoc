@@ -1,0 +1,14 @@
+=== 회원 삭제 API
+
+==== 1. Curl Request
+include::{snippets}/delete-user/curl-request.adoc[]
+
+==== 2. HTTP Request
+include::{snippets}/delete-user/http-request.adoc[]
+
+==== 3. HTTP Request Body
+include::{snippets}/delete-user/request-body.adoc[]
+
+==== 4. HTTP Response Body
+include::{snippets}/delete-user/response-body.adoc[]
+include::{snippets}/delete-user/response-fields.adoc[]
