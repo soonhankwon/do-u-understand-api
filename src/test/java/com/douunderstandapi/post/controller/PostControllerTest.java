@@ -230,7 +230,12 @@ class PostControllerTest {
     }
 
     private PostUpdateResponse createKnowledgeUpdateResponse() {
-        return PostUpdateResponse.of(1L, "RESTful API 이해하기", "Restful API란.....", "https://abcdefssss/2in2/update",
-                false);
+        return PostUpdateResponse.builder()
+                .id(1L)
+                .title("RESTful API 이해하기")
+                .content("Restful API란.....")
+                .link("https://abcdefssss/2in2/update")
+                .isUnderstand(false)
+                .build();
     }
 }
