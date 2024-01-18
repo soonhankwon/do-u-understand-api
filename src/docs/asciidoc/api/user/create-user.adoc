@@ -12,4 +12,3 @@ include::{snippets}/create-user/request-fields.adoc[]
 
 ==== 4. HTTP Response Body
 include::{snippets}/create-user/response-body.adoc[]
-include::{snippets}/create-user/response-fields.adoc[]
