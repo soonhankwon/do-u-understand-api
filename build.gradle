@@ -67,7 +67,8 @@ private excludedClassFilesForReport(classDirectories) {
             files(classDirectories.files.collect {
                 fileTree(dir: it, exclude: [
                         "**/Q*",
-                        "**/*Application*"
+                        "**/*Application*",
+                        "**/enumType/**"
                 ])
             })
     )
