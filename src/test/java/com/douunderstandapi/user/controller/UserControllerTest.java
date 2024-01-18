@@ -17,10 +17,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.douunderstandapi.annotation.WithUserPrincipals;
-import com.douunderstandapi.user.domain.dto.request.UserAddRequest;
-import com.douunderstandapi.user.domain.dto.request.UserEmailAuthRequest;
-import com.douunderstandapi.user.domain.dto.response.UserAddResponse;
-import com.douunderstandapi.user.domain.dto.response.UserEmailAuthResponse;
+import com.douunderstandapi.user.dto.request.UserAddRequest;
+import com.douunderstandapi.user.dto.response.UserAddResponse;
+import com.douunderstandapi.user.dto.response.UserDeleteResponse;
+import com.douunderstandapi.user.enumType.UserStatus;
 import com.douunderstandapi.user.service.UserService;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
@@ -73,17 +73,6 @@ class UserControllerTest {
                                         fieldWithPath("password").type(STRING).description("패스워드"),
                                         fieldWithPath("code").type(STRING).description("인증코드"),
                                         fieldWithPath("isAllowedNotification").type(BOOLEAN).description("알람설정여부")
-                                ),
-                                responseFields(
-                                        fieldWithPath("id")
-                                                .type(NUMBER)
-                                                .description("회원 ID"),
-                                        fieldWithPath("email")
-                                                .type(STRING)
-                                                .description("이메일"),
-                                        fieldWithPath("isAllowedNotification")
-                                                .type(BOOLEAN)
-                                                .description("알람설정여부")
                                 )
                         )
                 )
@@ -124,11 +113,47 @@ class UserControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @DisplayName("{PATCH} 유저 탈퇴 요청 - 정상호출")
+    @WithUserPrincipals
+    @Test
+    void deleteUser() throws Exception {
+        when(userService.deleteUser(any(String.class)))
+                .thenReturn(createUserDeleteResponse());
+
+        mvc.perform(
+                        RestDocumentationRequestBuilders.patch("/api/v1/users/delete")
+                                .with(csrf().asHeader()))
+                .andDo(print())
+                .andDo(
+                        document(
+                                "delete-user",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                responseFields(
+                                        fieldWithPath("id")
+                                                .type(NUMBER)
+                                                .description("회원 ID"),
+                                        fieldWithPath("email")
+                                                .type(STRING)
+                                                .description("이메일"),
+                                        fieldWithPath("userStatus")
+                                                .type(STRING)
+                                                .description("DELETED")
+                                )
+                        )
+                )
+                .andExpect(status().isOk());
+    }
+
     private UserAddResponse createUserAddResponse() {
-        return UserAddResponse.of(1L, "tester@gmail.com", true);
+        return UserAddResponse.of(1L, "test@gmail.com", true);
     }
 
     private UserEmailAuthResponse createUserEmailAuthResponse() {
         return UserEmailAuthResponse.from("5b86d3dc-f0c4-4226-b684-c1ca250b7c21");
+    }
+
+    private UserDeleteResponse createUserDeleteResponse() {
+        return UserDeleteResponse.of(1L, "test@email.com", UserStatus.DELETED);
     }
 }
