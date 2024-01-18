@@ -69,6 +69,6 @@ public class JwtProvider {
     private Map<String, Object> createClaims(Long id, String username) {
         return Map.of(
                 "id", id,
-                "username", username);
+                "email", username);
     }
 }
