@@ -3,11 +3,15 @@ package com.douunderstandapi.user.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import com.douunderstandapi.common.utils.mail.EmailUtils;
 import com.douunderstandapi.user.domain.User;
-import com.douunderstandapi.user.domain.dto.request.UserAddRequest;
-import com.douunderstandapi.user.domain.dto.response.UserAddResponse;
+import com.douunderstandapi.user.dto.request.UserAddRequest;
+import com.douunderstandapi.user.dto.response.UserAddResponse;
+import com.douunderstandapi.user.dto.response.UserDeleteResponse;
+import com.douunderstandapi.user.enumType.UserStatus;
 import com.douunderstandapi.user.repository.UserRepository;
 import com.douunderstandapi.user.repository.redis.UserEmailAuthCodeRepository;
 import java.util.Optional;
@@ -29,11 +33,14 @@ class UserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
-    @InjectMocks
-    private UserService userService;
-
     @Mock
     private UserEmailAuthCodeRepository userEmailAuthCodeRepository;
+
+    @Mock
+    private EmailUtils emailUtils;
+
+    @InjectMocks
+    private UserService userService;
 
     @Test
     @DisplayName("유저 가입 - 서비스 로직 테스트")
@@ -51,6 +58,34 @@ class UserServiceTest {
         UserAddResponse response = userService.addUser(request);
 
         assertThat(response.email()).isEqualTo(email);
+    }
+
+    @Test
+    @DisplayName("유저 이메일 인증 - 서비스 로직 테스트")
+    void authUserEmail() {
+        String code = UUID.randomUUID().toString();
+        String email = "test@gmail.com";
+
+        when(emailUtils.sendEmailAuthMessage(anyString())).thenReturn(code);
+        doNothing().when(userEmailAuthCodeRepository).put(anyString(), anyString());
+
+        UserEmailAuthRequest request = new UserEmailAuthRequest(email);
+        UserEmailAuthResponse response = userService.authUserEmail(request);
+
+        assertThat(response.code()).isEqualTo(code);
+    }
+
+    @Test
+    @DisplayName("유저 탈퇴 - 소프트 삭제 테스트")
+    void deleteUser_soft_delete() {
+        String email = "test@gmail.com";
+
+        when(userRepository.findByEmail(anyString()))
+                .thenReturn(Optional.of(createUser()));
+
+        UserDeleteResponse response = userService.deleteUser(email);
+
+        assertThat(response.userStatus()).isSameAs(UserStatus.DELETED);
     }
 
     private User createUser() {
