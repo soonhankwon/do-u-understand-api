@@ -1,8 +1,8 @@
 package com.douunderstandapi.common.security.filter;
 
+import com.douunderstandapi.auth.service.AuthService;
 import com.douunderstandapi.common.enumtype.ErrorCode;
 import com.douunderstandapi.common.security.impl.UserDetailsImpl;
-import com.douunderstandapi.common.utils.jwt.JwtProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -23,11 +23,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JwtVerificationFilter extends OncePerRequestFilter {
 
-    private final JwtProvider jwtProvider;
     private static final String JWT_PREFIX = "Bearer ";
+    private final AuthService authService;
 
     @Override
-    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         String bearerToken = getAuthenticationHeaderValue(request);
         return bearerToken == null || !bearerToken.startsWith(JWT_PREFIX);
     }
@@ -38,22 +38,23 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            setAuthenticationToContext(request);
+            setAuthenticationToContext(request, response);
         } catch (JwtException e) {
             request.setAttribute("exception", ErrorCode.INVALID_TOKEN);
         }
         filterChain.doFilter(request, response);
     }
 
-    private void setAuthenticationToContext(HttpServletRequest request) {
-        Authentication authentication = createAuthentication(request);
+    private void setAuthenticationToContext(HttpServletRequest request, HttpServletResponse response) {
+        Authentication authentication = createAuthentication(request, response);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    private Authentication createAuthentication(HttpServletRequest request) {
-        String accessToken = getAuthenticationHeaderValue(request)
-                .substring(JWT_PREFIX.length());
-        Claims claims = jwtProvider.getClaims(accessToken);
+    private Authentication createAuthentication(HttpServletRequest request, HttpServletResponse response) {
+        String accessToken = getAuthenticationHeaderValue(request);
+        accessToken = accessToken.substring(JWT_PREFIX.length());
+
+        Claims claims = authService.getClaims(accessToken);
         UserDetailsImpl userDetails = new UserDetailsImpl(claims);
 
         return new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(),
