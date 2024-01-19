@@ -54,21 +54,21 @@ public class AuthService {
         httpServletResponse.setHeader(HttpHeaders.AUTHORIZATION, accessToken);
 
         String refreshToken = jwtProvider.createRefreshToken(email);
-        ResponseCookie cookie = createCookie(refreshToken);
+        ResponseCookie cookie = createCookie(refreshToken, COOKIE_MAX_AGE);
 
         httpServletResponse.setHeader("Set-Cookie", cookie.toString());
         return new AuthLoginResponse(user.getId(), email, accessToken);
     }
 
-    private ResponseCookie createCookie(String refreshToken) {
-        return ResponseCookie.from(REFRESH_TOKEN_NAME, refreshToken)
-                .maxAge(AuthService.COOKIE_MAX_AGE)
-                .domain("localhost")
-                .path("/")
-                .secure(true)
-                .sameSite(SameSite.NONE.name())
-                .httpOnly(true)
-                .build();
+    public Boolean logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        Cookie cookie = Arrays.stream(httpServletRequest.getCookies())
+                .filter(c -> c.getName().equals("refresh_token"))
+                .findFirst()
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_COOKIE));
+        String refreshToken = cookie.getValue();
+        ResponseCookie expiredCookie = createCookie(refreshToken, 0);
+        httpServletResponse.setHeader("Set-Cookie", expiredCookie.toString());
+        return Boolean.TRUE;
     }
 
     public AuthLoginResponse refresh(HttpServletRequest httpServletRequest,
@@ -116,5 +116,16 @@ public class AuthService {
                 .findFirst()
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_COOKIE));
         return cookie.getValue();
+    }
+
+    private ResponseCookie createCookie(String refreshToken, int maxAge) {
+        return ResponseCookie.from(REFRESH_TOKEN_NAME, refreshToken)
+                .maxAge(maxAge)
+                .domain("localhost")
+                .path("/")
+                .secure(true)
+                .sameSite(SameSite.NONE.name())
+                .httpOnly(true)
+                .build();
     }
 }
