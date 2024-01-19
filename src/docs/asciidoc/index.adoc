@@ -21,7 +21,13 @@ include::api/user/delete-user.adoc[]
 
 = 포스트 관련 API
 
-include::api/post/create-post.adoc[]
+include::api/post/add-post.adoc[]
 include::api/post/get-post.adoc[]
 include::api/post/update-post.adoc[]
 include::api/post/delete-post.adoc[]
+
+= 포스트 구독 관련 API
+
+include::api/subscribe/get-subscribe-posts.adoc[]
+include::api/subscribe/add-subscribe.adoc[]
+include::api/subscribe/cancel-subscribe.adoc[]
