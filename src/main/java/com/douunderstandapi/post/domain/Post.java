@@ -3,6 +3,7 @@ package com.douunderstandapi.post.domain;
 import com.douunderstandapi.common.enumtype.ErrorCode;
 import com.douunderstandapi.common.exception.CustomException;
 import com.douunderstandapi.post.dto.request.PostUpdateRequest;
+import com.douunderstandapi.post.enumType.PostStatus;
 import com.douunderstandapi.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,11 +40,8 @@ public class Post {
     @Column(name = "link")
     private String link;
 
-    @Column(name = "is_understand", nullable = false)
-    private Boolean isUnderstand;
-
-    @Column(name = "is_subscribe", nullable = false)
-    private Boolean isSubscribe;
+    @Column(name = "post_status", nullable = false)
+    private PostStatus postStatus;
 
     @Column(name = "notification_count", nullable = false)
     private Integer notificationCount;
@@ -58,9 +56,8 @@ public class Post {
         this.title = title;
         this.content = content;
         this.link = link;
-        this.isUnderstand = false;
-        this.isSubscribe = false;
         this.notificationCount = 0;
+        this.postStatus = PostStatus.GENERAL;
         this.user = user;
         this.createdAt = LocalDateTime.now();
     }
@@ -76,13 +73,6 @@ public class Post {
         this.title = request.title();
         this.content = request.content();
         this.link = request.link();
-    }
-
-    public void updateSubscribeStatus(Boolean isSubscribe) {
-        if (isSubscribe == null) {
-            return;
-        }
-        this.isSubscribe = isSubscribe;
     }
 
     public void increaseNotificationCount() {
