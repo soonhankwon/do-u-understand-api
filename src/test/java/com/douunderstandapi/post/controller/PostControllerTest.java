@@ -9,7 +9,6 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
-import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -52,13 +51,16 @@ class PostControllerTest {
     @WithUserPrincipals
     @Test
     void addPost() throws Exception {
+        String title = "RESTful API";
+        String content = "Restful API란.....";
+        String link = "https://abcdefssss/2in2";
         JSONObject request = new JSONObject();
-        request.put("title", "RESTful API");
-        request.put("content", "Restful API란.....");
-        request.put("link", "https://abcdefssss/2in2");
+        request.put("title", title);
+        request.put("content", content);
+        request.put("link", link);
 
         when(postService.addPost(anyString(), any(PostAddRequest.class)))
-                .thenReturn(createPostAddResponse());
+                .thenReturn(createPostAddResponse(title, content, link));
 
         mvc.perform(
                         RestDocumentationRequestBuilders.post("/api/v1/posts")
@@ -68,7 +70,7 @@ class PostControllerTest {
                 .andDo(print())
                 .andDo(
                         document(
-                                "create-post",
+                                "add-post",
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 requestFields(
@@ -79,7 +81,7 @@ class PostControllerTest {
                                 responseFields(
                                         fieldWithPath("id")
                                                 .type(NUMBER)
-                                                .description("지식 ID"),
+                                                .description("포스트 ID"),
                                         fieldWithPath("title")
                                                 .type(STRING)
                                                 .description("제목"),
@@ -88,10 +90,7 @@ class PostControllerTest {
                                                 .description("컨텐츠"),
                                         fieldWithPath("link")
                                                 .type(STRING)
-                                                .description("관련링크"),
-                                        fieldWithPath("isUnderstand")
-                                                .type(BOOLEAN)
-                                                .description("이해여부")
+                                                .description("관련링크")
                                 )
                         )
                 )
@@ -102,11 +101,14 @@ class PostControllerTest {
     @WithUserPrincipals
     @Test
     void getPost() throws Exception {
+        String title = "RESTful API";
+        String content = "Restful API란.....";
+        String link = "https://abcdefssss/2in2";
         when(postService.findPost(anyString(), any(Long.class)))
-                .thenReturn(createPostDetailGetResponse());
+                .thenReturn(createPostGetResponse(title, content, link));
 
         mvc.perform(
-                        RestDocumentationRequestBuilders.get("/api/v1/posts/1")
+                        RestDocumentationRequestBuilders.get("/api/v1/posts/{postId}", 1)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andDo(
@@ -115,31 +117,30 @@ class PostControllerTest {
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 responseFields(
-                                        fieldWithPath("postDTO").type(OBJECT).description("게시글 정보"),
-                                        fieldWithPath("postDTO.id")
+                                        fieldWithPath("id")
                                                 .type(NUMBER)
                                                 .description("게시글 ID"),
-                                        fieldWithPath("postDTO.title")
+                                        fieldWithPath("title")
                                                 .type(STRING)
                                                 .description("제목"),
-                                        fieldWithPath("postDTO.content")
+                                        fieldWithPath("content")
                                                 .type(STRING)
                                                 .description("컨텐츠"),
-                                        fieldWithPath("postDTO.link")
+                                        fieldWithPath("link")
                                                 .type(STRING)
                                                 .description("관련링크"),
-                                        fieldWithPath("postDTO.isUnderstand")
-                                                .type(BOOLEAN)
-                                                .description("이해여부"),
-                                        fieldWithPath("postDTO.userEmail")
+                                        fieldWithPath("userEmail")
                                                 .type(STRING)
                                                 .description("작성자 이메일"),
-                                        fieldWithPath("postDTO.userId")
+                                        fieldWithPath("userId")
                                                 .type(NUMBER)
                                                 .description("작성자 ID"),
-                                        fieldWithPath("postDTO.createdAt")
+                                        fieldWithPath("createdAt")
                                                 .type(STRING)
-                                                .description("작성일시")
+                                                .description("작성일시"),
+                                        fieldWithPath("commentCount")
+                                                .type(NUMBER)
+                                                .description("코멘트 카운트")
                                 )
                         )
                 )
@@ -150,16 +151,20 @@ class PostControllerTest {
     @WithUserPrincipals
     @Test
     void updateKnowledge() throws Exception {
+        String title = "RESTful API";
+        String content = "Restful API란.....";
+        String link = "https://abcdefssss/2in2";
+
         JSONObject request = new JSONObject();
-        request.put("title", "RESTful API 이해하기");
-        request.put("content", "Restful API란.....222");
-        request.put("link", "https://abcdefssss/2in2/update");
+        request.put("title", title);
+        request.put("content", content);
+        request.put("link", link);
 
         when(postService.update(anyString(), any(Long.class), any(PostUpdateRequest.class)))
-                .thenReturn(createKnowledgeUpdateResponse());
+                .thenReturn(createKnowledgeUpdateResponse(title, content, link));
 
         mvc.perform(
-                        RestDocumentationRequestBuilders.put("/api/v1/posts/1")
+                        RestDocumentationRequestBuilders.put("/api/v1/posts/{postId}", 1)
                                 .with(csrf().asHeader())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(request.toString()))
@@ -177,7 +182,7 @@ class PostControllerTest {
                                 responseFields(
                                         fieldWithPath("id")
                                                 .type(NUMBER)
-                                                .description("지식 ID"),
+                                                .description("포스트 ID"),
                                         fieldWithPath("title")
                                                 .type(STRING)
                                                 .description("제목"),
@@ -187,9 +192,21 @@ class PostControllerTest {
                                         fieldWithPath("link")
                                                 .type(STRING)
                                                 .description("관련링크"),
-                                        fieldWithPath("isUnderstand")
+                                        fieldWithPath("commentCount")
+                                                .type(NUMBER)
+                                                .description("코멘트 카운트"),
+                                        fieldWithPath("createdAt")
+                                                .type(STRING)
+                                                .description("작성일시"),
+                                        fieldWithPath("userId")
+                                                .type(NUMBER)
+                                                .description("유저 ID"),
+                                        fieldWithPath("userEmail")
+                                                .type(STRING)
+                                                .description("이메일"),
+                                        fieldWithPath("subscribeMe")
                                                 .type(BOOLEAN)
-                                                .description("이해여부")
+                                                .description("구독여부")
                                 )
                         )
                 )
@@ -201,10 +218,10 @@ class PostControllerTest {
     @Test
     void deletePost() throws Exception {
         when(postService.delete(anyString(), any(Long.class)))
-                .thenReturn("deleted");
+                .thenReturn(Boolean.TRUE);
 
         mvc.perform(
-                        RestDocumentationRequestBuilders.delete("/api/v1/posts/1")
+                        RestDocumentationRequestBuilders.delete("/api/v1/posts/{postId}", 1)
                                 .with(csrf().asHeader()))
                 .andDo(print())
                 .andDo(
@@ -217,25 +234,34 @@ class PostControllerTest {
                 .andExpect(status().isOk());
     }
 
-    private PostAddResponse createPostAddResponse() {
-        return PostAddResponse.of(1L, "RESTful API", "Restful API란.....222", "https://abcdefssss/2in2", false);
+    private PostAddResponse createPostAddResponse(String title, String content, String link) {
+        return PostAddResponse.of(1L, title, content, link);
     }
 
-    private PostGetResponse createPostDetailGetResponse() {
+    private PostGetResponse createPostGetResponse(String title, String content, String link) {
         return PostGetResponse.builder()
+                .id(1L)
+                .userId(1L)
                 .userEmail("test@gmail.com")
-                .content("Restful API란.....")
+                .title(title)
+                .content(content)
+                .link(link)
                 .createdAt(LocalDateTime.now().toString())
+                .commentCount(1L)
                 .build();
     }
 
-    private PostUpdateResponse createKnowledgeUpdateResponse() {
+    private PostUpdateResponse createKnowledgeUpdateResponse(String title, String content, String link) {
         return PostUpdateResponse.builder()
                 .id(1L)
-                .title("RESTful API 이해하기")
-                .content("Restful API란.....")
-                .link("https://abcdefssss/2in2/update")
-                .isUnderstand(false)
+                .title(title)
+                .content(content)
+                .link(link)
+                .commentCount(1L)
+                .createdAt(LocalDateTime.now().toString())
+                .userId(1L)
+                .userEmail("test@gmail.com")
+                .subscribeMe(true)
                 .build();
     }
 }

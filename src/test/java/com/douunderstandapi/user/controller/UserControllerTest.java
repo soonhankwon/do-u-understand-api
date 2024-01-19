@@ -70,7 +70,7 @@ class UserControllerTest {
                 .andDo(print())
                 .andDo(
                         document(
-                                "create-user",
+                                "add-user",
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 requestFields(
@@ -83,40 +83,6 @@ class UserControllerTest {
                 )
                 .andExpect(status().isCreated());
     }
-
-//    @DisplayName("{POST} 이메일 인증요청 - 정상호출")
-//    @WithUserPrincipals
-//    @Test
-//    void authUserEmail() throws Exception {
-//        JSONObject request = new JSONObject();
-//        request.put("email", "test@gmail.com");
-//
-//        when(authService.authEmail(any(AuthEmailRequest.class)))
-//                .thenReturn(createUserEmailAuthResponse());
-//
-//        mvc.perform(
-//                        RestDocumentationRequestBuilders.post("/api/v1/users/auth-email")
-//                                .with(csrf().asHeader())
-//                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                                .content(request.toString()))
-//                .andDo(print())
-//                .andDo(
-//                        document(
-//                                "auth-user-email",
-//                                preprocessRequest(prettyPrint()),
-//                                preprocessResponse(prettyPrint()),
-//                                requestFields(
-//                                        fieldWithPath("email").type(STRING).description("이메일")
-//                                ),
-//                                responseFields(
-//                                        fieldWithPath("code")
-//                                                .type(STRING)
-//                                                .description("인증코드")
-//                                )
-//                        )
-//                )
-//                .andExpect(status().isOk());
-//    }
 
     @DisplayName("{PATCH} 유저 탈퇴 요청 - 정상호출")
     @WithUserPrincipals

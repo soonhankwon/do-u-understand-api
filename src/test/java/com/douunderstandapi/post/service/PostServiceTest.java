@@ -44,7 +44,7 @@ class PostServiceTest {
         String email = "test@gmail.com";
         String link = "https://sdnksnd/sds123";
 
-        PostAddRequest request = new PostAddRequest(title, content, link);
+        PostAddRequest request = createPostAddRequest(title, content, link);
 
         PostAddResponse response = postService.addPost(email, request);
 
@@ -60,7 +60,7 @@ class PostServiceTest {
         String email = "test@gmail.com";
         String link = "https://sdnksnd/sds123";
 
-        PostAddRequest request = new PostAddRequest(title, content, link);
+        PostAddRequest request = createPostAddRequest(title, content, link);
 
         assertThatThrownBy(() ->
                 postService.addPost(email, request))
@@ -101,6 +101,10 @@ class PostServiceTest {
 
         assertThatThrownBy(() -> postService.delete(email, 1L))
                 .isInstanceOf(CustomException.class);
+    }
+
+    private PostAddRequest createPostAddRequest(String title, String content, String link) {
+        return new PostAddRequest(title, content, link);
     }
 
     private Post createKnowledge() {
