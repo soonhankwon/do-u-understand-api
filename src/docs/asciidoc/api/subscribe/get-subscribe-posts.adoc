@@ -1,0 +1,18 @@
+=== 구독 포스트 목록조회 API
+
+==== 1. Curl Request
+
+include::{snippets}/get-subscribe-posts/curl-request.adoc[]
+
+==== 2. HTTP Request
+
+include::{snippets}/get-subscribe-posts/http-request.adoc[]
+
+==== 3. HTTP Request Body
+
+include::{snippets}/get-subscribe-posts/request-body.adoc[]
+
+==== 4. HTTP Response Body
+
+include::{snippets}/get-subscribe-posts/response-body.adoc[]
+include::{snippets}/get-subscribe-posts/response-fields.adoc[]

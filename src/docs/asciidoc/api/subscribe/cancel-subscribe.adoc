@@ -1,0 +1,17 @@
+=== 포스트 구독 취소 API
+
+==== 1. Curl Request
+
+include::{snippets}/cancel-subscribe-post/curl-request.adoc[]
+
+==== 2. HTTP Request
+
+include::{snippets}/cancel-subscribe-post/http-request.adoc[]
+
+==== 3. HTTP Request Body
+
+include::{snippets}/cancel-subscribe-post/request-body.adoc[]
+
+==== 4. HTTP Response Body
+
+include::{snippets}/cancel-subscribe-post/response-body.adoc[]
