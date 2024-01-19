@@ -3,7 +3,8 @@ package com.douunderstandapi.notification.service;
 import com.douunderstandapi.common.utils.mail.EmailUtils;
 import com.douunderstandapi.common.utils.mail.dto.NotificationEmailDTO;
 import com.douunderstandapi.post.domain.Post;
-import com.douunderstandapi.post.repository.PostRepository;
+import com.douunderstandapi.subscribe.domain.Subscribe;
+import com.douunderstandapi.subscribe.repository.SubscribeRepository;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.repository.UserRepository;
 import java.util.Comparator;
@@ -20,39 +21,40 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class NotificationService {
 
-    private final PostRepository postRepository;
+    private final SubscribeRepository subscribeRepository;
     private final UserRepository userRepository;
     private final EmailUtils emailUtils;
 
     @Scheduled(cron = "0 0 8 * * *")
     public void sendUnderstandNotificationInMorning() {
         List<User> users = findUserByAllowedNotification();
-        sendPriorityKnowledgeByEmail(users);
+        sendPriorityPostsByEmail(users);
     }
 
     @Scheduled(cron = "0 0 13 * * *")
     public void sendUnderstandNotificationInAfternoon() {
         List<User> users = findUserByAllowedNotification();
-        sendPriorityKnowledgeByEmail(users);
+        sendPriorityPostsByEmail(users);
     }
 
     @Scheduled(cron = "0 0 20 * * *")
     public void sendUnderstandNotificationInEvening() {
         List<User> users = findUserByAllowedNotification();
-        sendPriorityKnowledgeByEmail(users);
+        sendPriorityPostsByEmail(users);
     }
 
     private List<User> findUserByAllowedNotification() {
         return userRepository.findAllByIsAllowedNotification(true);
     }
 
-    private void sendPriorityKnowledgeByEmail(List<User> users) {
+    private void sendPriorityPostsByEmail(List<User> users) {
+
         users.forEach(u -> {
-            List<Post> knowledgesByUserSubscribe = postRepository.findAllByUserAndIsSubscribe(u,
-                    true);
+            List<Subscribe> subscribes = subscribeRepository.findAllByUser(u);
 
             // 알람 신청한 지식중 알람 카운터가 가장 적은것을 하나 전송한다(Round Robin)
-            knowledgesByUserSubscribe.stream()
+            subscribes.stream()
+                    .map(Subscribe::getPost)
                     .min(Comparator.comparing(Post::getNotificationCount))
                     .ifPresent(k -> {
                         k.increaseNotificationCount();
@@ -62,6 +64,6 @@ public class NotificationService {
     }
 
     private void sendEmail(User user, Post post) {
-        emailUtils.sendKnowledgeNotificationMessage(user.getEmail(), NotificationEmailDTO.from(post));
+        emailUtils.sendPostNotificationMessage(user.getEmail(), NotificationEmailDTO.from(post));
     }
 }
