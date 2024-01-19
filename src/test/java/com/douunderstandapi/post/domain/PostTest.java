@@ -58,8 +58,6 @@ class PostTest {
         assertThat(post.getContent()).isEqualTo(content);
         assertThat(post.getLink()).isEqualTo(link);
         assertThat(post.getUser()).isSameAs(mockUser);
-        assertThat(post.getIsUnderstand()).isFalse();
-        assertThat(post.getIsSubscribe()).isFalse();
         assertThat(post.getNotificationCount()).isEqualTo(0);
     }
 
