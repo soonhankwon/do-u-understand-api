@@ -40,7 +40,7 @@ public class EmailUtils {
         }
     }
 
-    public String sendKnowledgeNotificationMessage(String targetEmail, NotificationEmailDTO dto) {
+    public String sendPostNotificationMessage(String targetEmail, NotificationEmailDTO dto) {
         try {
             MimeMessage message = createMessage(targetEmail, dto);
             javaMailSender.send(message);
