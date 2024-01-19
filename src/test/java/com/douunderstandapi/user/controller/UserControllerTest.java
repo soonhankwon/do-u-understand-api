@@ -17,13 +17,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.douunderstandapi.annotation.WithUserPrincipals;
-import com.douunderstandapi.auth.dto.request.AuthEmailRequest;
-import com.douunderstandapi.auth.service.AuthService;
 import com.douunderstandapi.user.dto.request.UserAddRequest;
 import com.douunderstandapi.user.dto.response.UserAddResponse;
 import com.douunderstandapi.user.dto.response.UserDeleteResponse;
 import com.douunderstandapi.user.enumType.UserStatus;
 import com.douunderstandapi.user.service.UserService;
+import java.util.UUID;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
@@ -45,9 +45,6 @@ class UserControllerTest {
 
     @MockBean
     private UserService userService;
-
-    @MockBean
-    private AuthService authService;
 
     @DisplayName("{POST} 회원등록 - 정상호출")
     @WithUserPrincipals
@@ -93,7 +90,8 @@ class UserControllerTest {
 
         mvc.perform(
                         RestDocumentationRequestBuilders.patch("/api/v1/users/delete")
-                                .with(csrf().asHeader()))
+                                .with(csrf().asHeader())
+                                .header(HttpHeaders.AUTHORIZATION, UUID.randomUUID().toString()))
                 .andDo(print())
                 .andDo(
                         document(
@@ -118,10 +116,6 @@ class UserControllerTest {
 
     private UserAddResponse createUserAddResponse() {
         return UserAddResponse.of(1L, "test@gmail.com", true);
-    }
-
-    private AuthEmailRequest createUserEmailAuthResponse() {
-        return new AuthEmailRequest("5b86d3dc-f0c4-4226-b684-c1ca250b7c21");
     }
 
     private UserDeleteResponse createUserDeleteResponse() {

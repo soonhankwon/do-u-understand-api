@@ -27,12 +27,14 @@ import com.douunderstandapi.subscribe.service.SubscribeService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -57,7 +59,8 @@ class SubscribeControllerTest {
         mvc.perform(
                         RestDocumentationRequestBuilders.get("/api/v1/subscribe")
                                 .param("pageNumber", "5")
-                                .with(csrf().asHeader()))
+                                .with(csrf().asHeader())
+                                .header(HttpHeaders.AUTHORIZATION, UUID.randomUUID().toString()))
                 .andDo(print())
                 .andDo(
                         document(
@@ -113,7 +116,8 @@ class SubscribeControllerTest {
 
         mvc.perform(
                         RestDocumentationRequestBuilders.post("/api/v1/subscribe/{postId}", 1)
-                                .with(csrf().asHeader()))
+                                .with(csrf().asHeader())
+                                .header(HttpHeaders.AUTHORIZATION, UUID.randomUUID().toString()))
                 .andDo(print())
                 .andDo(
                         document(
@@ -139,7 +143,8 @@ class SubscribeControllerTest {
 
         mvc.perform(
                         RestDocumentationRequestBuilders.delete("/api/v1/subscribe/{postId}", 1)
-                                .with(csrf().asHeader()))
+                                .with(csrf().asHeader())
+                                .header(HttpHeaders.AUTHORIZATION, UUID.randomUUID().toString()))
                 .andDo(print())
                 .andDo(
                         document(

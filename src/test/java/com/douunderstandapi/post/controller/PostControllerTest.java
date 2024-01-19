@@ -25,6 +25,7 @@ import com.douunderstandapi.post.dto.response.PostGetResponse;
 import com.douunderstandapi.post.dto.response.PostUpdateResponse;
 import com.douunderstandapi.post.service.PostService;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
@@ -65,6 +67,7 @@ class PostControllerTest {
         mvc.perform(
                         RestDocumentationRequestBuilders.post("/api/v1/posts")
                                 .with(csrf().asHeader())
+                                .header(HttpHeaders.AUTHORIZATION, UUID.randomUUID().toString())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(request.toString()))
                 .andDo(print())
@@ -109,7 +112,7 @@ class PostControllerTest {
 
         mvc.perform(
                         RestDocumentationRequestBuilders.get("/api/v1/posts/{postId}", 1)
-                                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                                .header(HttpHeaders.AUTHORIZATION, UUID.randomUUID().toString()))
                 .andDo(print())
                 .andDo(
                         document(
@@ -150,7 +153,7 @@ class PostControllerTest {
     @DisplayName("{PUT} 포스트 업데이트 - 정상호출")
     @WithUserPrincipals
     @Test
-    void updateKnowledge() throws Exception {
+    void updatePost() throws Exception {
         String title = "RESTful API";
         String content = "Restful API란.....";
         String link = "https://abcdefssss/2in2";
@@ -166,6 +169,7 @@ class PostControllerTest {
         mvc.perform(
                         RestDocumentationRequestBuilders.put("/api/v1/posts/{postId}", 1)
                                 .with(csrf().asHeader())
+                                .header(HttpHeaders.AUTHORIZATION, UUID.randomUUID().toString())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(request.toString()))
                 .andDo(print())
@@ -222,7 +226,8 @@ class PostControllerTest {
 
         mvc.perform(
                         RestDocumentationRequestBuilders.delete("/api/v1/posts/{postId}", 1)
-                                .with(csrf().asHeader()))
+                                .with(csrf().asHeader())
+                                .header(HttpHeaders.AUTHORIZATION, UUID.randomUUID().toString()))
                 .andDo(print())
                 .andDo(
                         document(
