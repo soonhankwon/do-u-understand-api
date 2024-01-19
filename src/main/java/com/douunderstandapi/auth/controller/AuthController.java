@@ -46,9 +46,10 @@ public class AuthController {
     }
 
     @DeleteMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest httpServletRequest,
-                                    HttpServletResponse httpServletResponse) {
-        //로그아웃 로직
-        return ResponseEntity.ok().body("logout");
+    public ResponseEntity<Boolean> logout(HttpServletRequest httpServletRequest,
+                                          HttpServletResponse httpServletResponse) {
+
+        Boolean res = authService.logout(httpServletRequest, httpServletResponse);
+        return ResponseEntity.ok().body(res);
     }
 }
