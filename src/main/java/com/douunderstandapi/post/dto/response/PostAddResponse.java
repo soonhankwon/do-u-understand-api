@@ -6,11 +6,10 @@ public record PostAddResponse(
         Long id,
         String title,
         String content,
-        String link,
-        Boolean isUnderstand
+        String link
 ) {
-    public static PostAddResponse of(Long id, String title, String content, String link, Boolean isUnderstand) {
-        return new PostAddResponse(id, title, content, link, isUnderstand);
+    public static PostAddResponse of(Long id, String title, String content, String link) {
+        return new PostAddResponse(id, title, content, link);
     }
 
     public static PostAddResponse from(Post post) {
@@ -18,8 +17,7 @@ public record PostAddResponse(
                 post.getId(),
                 post.getTitle(),
                 post.getContent(),
-                post.getLink(),
-                post.getIsUnderstand()
+                post.getLink()
         );
     }
 }

@@ -9,27 +9,23 @@ public record PostUpdateResponse(
         String title,
         String content,
         String link,
-        Boolean isUnderstand,
-        Long likeCount,
         Long commentCount,
         String createdAt,
         Long userId,
         String userEmail,
-        Boolean likeMe
+        Boolean subscribeMe
 ) {
-    public static PostUpdateResponse from(Post post) {
+    public static PostUpdateResponse of(Post post, boolean subscribeMe) {
         return PostUpdateResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .link(post.getLink())
-                .isUnderstand(post.getIsUnderstand())
-                .likeCount(0L)
                 .commentCount(0L)
                 .createdAt(post.getCreatedAt().toString())
                 .userId(post.getUser().getId())
                 .userEmail(post.getUser().getEmail())
-                .likeMe(false)
+                .subscribeMe(subscribeMe)
                 .build();
     }
 }
