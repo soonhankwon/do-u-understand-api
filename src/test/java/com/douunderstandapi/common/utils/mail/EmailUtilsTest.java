@@ -23,7 +23,7 @@ class EmailUtilsTest {
         String link = "link";
         NotificationEmailDTO dto = new NotificationEmailDTO(title, content, link);
 
-        String res = emailUtils.sendKnowledgeNotificationMessage(email, dto);
+        String res = emailUtils.sendPostNotificationMessage(email, dto);
         assertThat(res).isEqualTo("success");
     }
 }
