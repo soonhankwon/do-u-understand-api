@@ -13,6 +13,12 @@ endif::[]
 
 == 커스텀 에러
 
+= 인증 관련 API
+
+include::api/auth/auth-login.adoc[]
+include::api/auth/auth-email.adoc[]
+include::api/auth/auth-refresh.adoc[]
+
 = 회원 관련 API
 
 include::api/user/create-user.adoc[]
