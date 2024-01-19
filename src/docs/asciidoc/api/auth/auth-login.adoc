@@ -1,0 +1,19 @@
+=== 로그인 API
+
+==== 1. Curl Request
+
+include::{snippets}/auth-login/curl-request.adoc[]
+
+==== 2. HTTP Request
+
+include::{snippets}/auth-login/http-request.adoc[]
+
+==== 3. HTTP Request Body
+
+include::{snippets}/auth-login/request-body.adoc[]
+include::{snippets}/auth-login/request-fields.adoc[]
+
+==== 4. HTTP Response Body
+
+include::{snippets}/auth-login/response-body.adoc[]
+include::{snippets}/auth-login/response-fields.adoc[]

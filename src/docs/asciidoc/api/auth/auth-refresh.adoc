@@ -1,0 +1,18 @@
+=== 토큰 리프레시 API
+
+==== 1. Curl Request
+
+include::{snippets}/auth-refresh/curl-request.adoc[]
+
+==== 2. HTTP Request
+
+include::{snippets}/auth-refresh/http-request.adoc[]
+
+==== 3. HTTP Request Body
+
+include::{snippets}/auth-refresh/request-body.adoc[]
+
+==== 4. HTTP Response Body
+
+include::{snippets}/auth-refresh/response-body.adoc[]
+include::{snippets}/auth-refresh/response-fields.adoc[]
