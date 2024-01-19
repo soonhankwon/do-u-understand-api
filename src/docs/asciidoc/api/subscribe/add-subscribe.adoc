@@ -1,0 +1,18 @@
+=== 포스트 구독 API
+
+==== 1. Curl Request
+
+include::{snippets}/add-subscribe-post/curl-request.adoc[]
+
+==== 2. HTTP Request
+
+include::{snippets}/add-subscribe-post/http-request.adoc[]
+
+==== 3. HTTP Request Body
+
+include::{snippets}/add-subscribe-post/request-body.adoc[]
+
+==== 4. HTTP Response Body
+
+include::{snippets}/add-subscribe-post/response-body.adoc[]
+include::{snippets}/add-subscribe-post/response-fields.adoc[]
