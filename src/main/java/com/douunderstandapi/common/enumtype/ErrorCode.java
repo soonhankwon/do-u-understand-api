@@ -21,6 +21,7 @@ public enum ErrorCode {
     NO_AUTH_ACCESS(4010, "접근할 수 있는 권한이 없습니다."),
     NOT_EXIST_COOKIE(4010, "쿠키가 없습니다. 로그인을 해주세요."),
     COOKIE_EXPIRATION(4011, "만료된 쿠키입니다."),
+    DUPLICATED_SUBSCRIBE(4012, "중복된 구독 요청입니다."),
 
     //500
     UNKNOWN(5000, "서버 내부 에러가 발생했습니다."),
