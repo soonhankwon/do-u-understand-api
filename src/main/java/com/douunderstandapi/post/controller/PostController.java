@@ -40,13 +40,13 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<PostsGetResponse> getPostsByUser(
+    public ResponseEntity<PostsGetResponse> getPosts(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam int pageNumber,
             @RequestParam(required = false) String mode) {
 
         String email = getEmailFromUserDetails(userDetails);
-        PostsGetResponse response = postService.findPostsByUser(email, pageNumber);
+        PostsGetResponse response = postService.findPosts(email, pageNumber, mode);
         return ResponseEntity.ok().body(response);
     }
 
@@ -68,10 +68,10 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<String> deletePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                             @PathVariable Long postId) {
+    public ResponseEntity<Boolean> deletePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                              @PathVariable Long postId) {
         String email = getEmailFromUserDetails(userDetails);
-        String response = postService.delete(email, postId);
+        Boolean response = postService.delete(email, postId);
         return ResponseEntity.ok().body(response);
     }
 

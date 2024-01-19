@@ -10,10 +10,14 @@ import com.douunderstandapi.post.dto.response.PostAddResponse;
 import com.douunderstandapi.post.dto.response.PostGetResponse;
 import com.douunderstandapi.post.dto.response.PostUpdateResponse;
 import com.douunderstandapi.post.dto.response.PostsGetResponse;
+import com.douunderstandapi.post.enumType.PostStatus;
 import com.douunderstandapi.post.repository.PostRepository;
+import com.douunderstandapi.subscribe.domain.Subscribe;
+import com.douunderstandapi.subscribe.repository.SubscribeRepository;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.repository.UserRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,6 +34,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final SubscribeRepository subscribeRepository;
 
     public PostAddResponse addPost(String email, PostAddRequest request) {
         User user = userRepository
@@ -68,10 +73,15 @@ public class PostService {
         // 자신이 작성한 지식이 아니라면 업데이트 거부
         post.validateAccessAuth(user);
         post.update(request);
-        return PostUpdateResponse.from(post);
+
+        Optional<Subscribe> optionalSubscribe = subscribeRepository.findByUserAndPost(user, post);
+        if (optionalSubscribe.isPresent()) {
+            return PostUpdateResponse.of(post, true);
+        }
+        return PostUpdateResponse.of(post, false);
     }
 
-    public String delete(String email, Long postId) {
+    public Boolean delete(String email, Long postId) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
@@ -81,28 +91,41 @@ public class PostService {
 
         // 자신이 작성한 지식이 아니라면 삭제 거부
         post.validateAccessAuth(user);
+        subscribeRepository.deleteAllByPost(post);
         postRepository.delete(post);
 
-        return "deleted";
+        return Boolean.TRUE;
     }
 
-    public PostsGetResponse findPostsByUser(String email, int pageNumber) {
+    public PostsGetResponse findPosts(String email, int pageNumber, String mode) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
         Pageable pageable = PageRequest.of(pageNumber, 10);
-        Page<Post> page = postRepository.findAllByUser(user, pageable);
+        Page<Post> page;
+        if (mode.equals("all")) {
+            page = postRepository.findAllByPostStatus(PostStatus.NOTICE, pageable);
+        } else {
+            page = postRepository.findAllByUser(user, pageable);
+        }
 
         int totalPages = page.getTotalPages();
         List<Post> posts = page.getContent();
-        List<PostDTO> postDTO = getPostDTO(posts);
 
+        List<PostDTO> postDTO = getPostDTO(posts, user);
         return new PostsGetResponse(totalPages, postDTO);
     }
 
-    private List<PostDTO> getPostDTO(List<Post> posts) {
+    private List<PostDTO> getPostDTO(List<Post> posts, User user) {
         return posts.stream()
-                .map(PostDTO::from)
+                .map(p -> {
+                    Optional<Subscribe> optionalSubscribe = subscribeRepository.findByUserAndPost(user, p);
+                    if (optionalSubscribe.isPresent()) {
+                        return PostDTO.of(p, true);
+                    } else {
+                        return PostDTO.of(p, false);
+                    }
+                })
                 .collect(Collectors.toList());
     }
 }
