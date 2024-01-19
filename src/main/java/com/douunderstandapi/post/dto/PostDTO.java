@@ -9,28 +9,24 @@ public record PostDTO(
         String title,
         String content,
         String link,
-        Long likeCount,
         Long commentCount,
-        Boolean isUnderstand,
         String userEmail,
         Long userId,
         String createdAt,
-        Boolean likeMe
+        Boolean subscribeMe
 ) {
 
-    public static PostDTO from(Post post) {
+    public static PostDTO of(Post post, Boolean subscribeMe) {
         return PostDTO.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .link(post.getLink())
-                .likeCount(0L)
                 .commentCount(0L)
-                .isUnderstand(post.getIsUnderstand())
                 .userEmail(post.getUser().getEmail())
                 .userId(post.getUser().getId())
                 .createdAt(post.getCreatedAt().toString())
-                .likeMe(false)
+                .subscribeMe(subscribeMe)
                 .build();
     }
 }
