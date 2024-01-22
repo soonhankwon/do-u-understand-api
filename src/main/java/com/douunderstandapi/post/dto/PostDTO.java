@@ -17,13 +17,13 @@ public record PostDTO(
         String categoryName
 ) {
 
-    public static PostDTO of(Post post, Boolean subscribeMe) {
+    public static PostDTO of(Post post, Long commentCount, Boolean subscribeMe) {
         return PostDTO.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .link(post.getLink())
-                .commentCount(0L)
+                .commentCount(commentCount)
                 .userEmail(post.getUser().getEmail())
                 .userId(post.getUser().getId())
                 .createdAt(post.getCreatedAt().toString())
