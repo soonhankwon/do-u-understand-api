@@ -4,12 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import com.douunderstandapi.auth.dto.request.AuthEmailRequest;
 import com.douunderstandapi.auth.dto.request.AuthLoginRequest;
 import com.douunderstandapi.auth.dto.response.AuthEmailResponse;
 import com.douunderstandapi.auth.dto.response.AuthLoginResponse;
+import com.douunderstandapi.auth.repository.redis.AuthEmailCodeRepository;
 import com.douunderstandapi.common.exception.CustomException;
 import com.douunderstandapi.common.utils.jwt.JwtProvider;
 import com.douunderstandapi.common.utils.mail.EmailUtils;
@@ -48,6 +50,9 @@ class AuthServiceTest {
 
     @Mock
     private EmailUtils emailUtils;
+
+    @Mock
+    private AuthEmailCodeRepository authEmailCodeRepository;
 
     @InjectMocks
     private AuthService authService;
@@ -141,6 +146,7 @@ class AuthServiceTest {
         when(emailUtils.sendEmailAuthMessage(anyString()))
                 .thenReturn(mockCode);
 
+        doNothing().when(authEmailCodeRepository).put(anyString(), anyString());
         AuthEmailResponse response = authService.authEmail(request);
 
         assertThat(response.code()).isEqualTo(mockCode);
