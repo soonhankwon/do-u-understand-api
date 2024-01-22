@@ -13,7 +13,8 @@ public record PostDTO(
         String userEmail,
         Long userId,
         String createdAt,
-        Boolean subscribeMe
+        Boolean subscribeMe,
+        String categoryName
 ) {
 
     public static PostDTO of(Post post, Boolean subscribeMe) {
@@ -27,6 +28,7 @@ public record PostDTO(
                 .userId(post.getUser().getId())
                 .createdAt(post.getCreatedAt().toString())
                 .subscribeMe(subscribeMe)
+                .categoryName(post.getCategory().getName())
                 .build();
     }
 }
