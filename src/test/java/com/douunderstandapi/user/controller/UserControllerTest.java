@@ -91,6 +91,7 @@ class UserControllerTest {
 
         mvc.perform(
                         RestDocumentationRequestBuilders.patch("/api/v1/users/delete")
+                                .param("code", UUID.randomUUID().toString())
                                 .with(csrf().asHeader())
                                 .header(HttpHeaders.AUTHORIZATION, UUID.randomUUID().toString()))
                 .andDo(print())
