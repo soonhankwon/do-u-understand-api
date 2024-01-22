@@ -85,11 +85,12 @@ class UserServiceTest {
     @DisplayName("유저 탈퇴 - 소프트 삭제 테스트")
     void deleteUser_soft_delete() {
         String email = "test@gmail.com";
+        String authCode = UUID.randomUUID().toString();
 
         when(userRepository.findByEmail(anyString()))
                 .thenReturn(Optional.of(createUser()));
 
-        UserDeleteResponse response = userService.deleteUser(email);
+        UserDeleteResponse response = userService.deleteUser(email, authCode);
 
         assertThat(response.userStatus()).isSameAs(UserStatus.DELETED);
     }
