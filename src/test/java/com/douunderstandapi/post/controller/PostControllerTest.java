@@ -26,8 +26,8 @@ import com.douunderstandapi.post.dto.response.PostGetResponse;
 import com.douunderstandapi.post.dto.response.PostUpdateResponse;
 import com.douunderstandapi.post.service.PostService;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,7 +58,9 @@ class PostControllerTest {
         String title = "RESTful API";
         String content = "Restful API란.....";
         String link = "https://abcdefssss/2in2";
-        List<String> categoryNames = List.of("java");
+        JSONArray categoryNames = new JSONArray();
+        categoryNames.put("java");
+
         JSONObject request = new JSONObject();
         request.put("title", title);
         request.put("content", content);
@@ -90,6 +92,9 @@ class PostControllerTest {
                                         fieldWithPath("id")
                                                 .type(NUMBER)
                                                 .description("포스트 ID"),
+                                        fieldWithPath("userEmail")
+                                                .type(STRING)
+                                                .description("이메일"),
                                         fieldWithPath("title")
                                                 .type(STRING)
                                                 .description("제목"),
@@ -99,6 +104,9 @@ class PostControllerTest {
                                         fieldWithPath("link")
                                                 .type(STRING)
                                                 .description("관련링크"),
+                                        fieldWithPath("commentCount")
+                                                .type(NUMBER)
+                                                .description(0),
                                         fieldWithPath("categoryName")
                                                 .type(STRING)
                                                 .description("카테고리 이름")
@@ -151,7 +159,10 @@ class PostControllerTest {
                                                 .description("작성일시"),
                                         fieldWithPath("commentCount")
                                                 .type(NUMBER)
-                                                .description("코멘트 카운트")
+                                                .description("코멘트 카운트"),
+                                        fieldWithPath("categoryName")
+                                                .type(STRING)
+                                                .description("카테고리 이름")
                                 )
                         )
                 )
@@ -165,14 +176,16 @@ class PostControllerTest {
         String title = "RESTful API";
         String content = "Restful API란.....";
         String link = "https://abcdefssss/2in2";
+        String categoryName = "spring";
 
         JSONObject request = new JSONObject();
         request.put("title", title);
         request.put("content", content);
         request.put("link", link);
+        request.put("categoryName", categoryName);
 
         when(postService.update(anyString(), any(Long.class), any(PostUpdateRequest.class)))
-                .thenReturn(createKnowledgeUpdateResponse(title, content, link));
+                .thenReturn(createKnowledgeUpdateResponse(title, content, link, categoryName));
 
         mvc.perform(
                         RestDocumentationRequestBuilders.put("/api/v1/posts/{postId}", 1)
@@ -189,7 +202,8 @@ class PostControllerTest {
                                 requestFields(
                                         fieldWithPath("title").type(STRING).description("제목"),
                                         fieldWithPath("content").type(STRING).description("컨텐츠"),
-                                        fieldWithPath("link").type(STRING).description("관련링크")
+                                        fieldWithPath("link").type(STRING).description("관련링크"),
+                                        fieldWithPath("categoryName").type(STRING).description("카테고리 이름")
                                 ),
                                 responseFields(
                                         fieldWithPath("id")
@@ -216,6 +230,9 @@ class PostControllerTest {
                                         fieldWithPath("userEmail")
                                                 .type(STRING)
                                                 .description("이메일"),
+                                        fieldWithPath("categoryName")
+                                                .type(STRING)
+                                                .description("카테고리 이름"),
                                         fieldWithPath("subscribeMe")
                                                 .type(BOOLEAN)
                                                 .description("구독여부")
@@ -261,10 +278,12 @@ class PostControllerTest {
                 .link(link)
                 .createdAt(LocalDateTime.now().toString())
                 .commentCount(1L)
+                .categoryName("java")
                 .build();
     }
 
-    private PostUpdateResponse createKnowledgeUpdateResponse(String title, String content, String link) {
+    private PostUpdateResponse createKnowledgeUpdateResponse(String title, String content, String link,
+                                                             String categoryName) {
         return PostUpdateResponse.builder()
                 .id(1L)
                 .title(title)
@@ -275,6 +294,7 @@ class PostControllerTest {
                 .userId(1L)
                 .userEmail("test@gmail.com")
                 .subscribeMe(true)
+                .categoryName(categoryName)
                 .build();
     }
 }

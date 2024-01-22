@@ -21,6 +21,7 @@ import com.douunderstandapi.auth.dto.request.AuthLoginRequest;
 import com.douunderstandapi.auth.dto.response.AuthEmailResponse;
 import com.douunderstandapi.auth.dto.response.AuthLoginResponse;
 import com.douunderstandapi.auth.service.AuthService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
@@ -63,6 +64,7 @@ class AuthControllerTest {
                         RestDocumentationRequestBuilders.post("/api/v1/auth/login")
                                 .with(csrf().asHeader())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .cookie(new Cookie("refresh_token", UUID.randomUUID().toString()))
                                 .content(request.toString()))
                 .andDo(print())
                 .andDo(
@@ -160,15 +162,32 @@ class AuthControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @DisplayName("{POST} 로그아웃 - 정상호출")
+    @WithUserPrincipals
+    @Test
+    void logout() throws Exception {
+        when(authService.logout(any(HttpServletRequest.class), any(HttpServletResponse.class)))
+                .thenReturn(Boolean.TRUE);
+
+        mvc.perform(
+                        RestDocumentationRequestBuilders.delete("/api/v1/auth/logout")
+                                .with(csrf().asHeader()))
+                .andDo(print())
+                .andDo(
+                        document(
+                                "auth-logout",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint())
+                        )
+                )
+                .andExpect(status().isOk());
+    }
+
     private AuthLoginResponse createAuthLoginResponse(Long id, String email) {
         return new AuthLoginResponse(id, email, UUID.randomUUID().toString());
     }
 
     private AuthEmailResponse createAuthEmailResponse() {
         return new AuthEmailResponse(UUID.randomUUID().toString());
-    }
-
-    @Test
-    void logout() {
     }
 }

@@ -1,6 +1,7 @@
 package com.douunderstandapi.user.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -85,11 +86,12 @@ class UserControllerTest {
     @WithUserPrincipals
     @Test
     void deleteUser() throws Exception {
-        when(userService.deleteUser(any(String.class)))
+        when(userService.deleteUser(anyString(), anyString()))
                 .thenReturn(createUserDeleteResponse());
 
         mvc.perform(
                         RestDocumentationRequestBuilders.patch("/api/v1/users/delete")
+                                .param("code", UUID.randomUUID().toString())
                                 .with(csrf().asHeader())
                                 .header(HttpHeaders.AUTHORIZATION, UUID.randomUUID().toString()))
                 .andDo(print())

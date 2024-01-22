@@ -15,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -68,6 +69,16 @@ public class User extends UserBaseTimeEntity {
     public void validatePassword(String password, BiFunction<String, String, Boolean> matches) {
         if (!matches.apply(password, this.password)) {
             throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_MATCHED_EMAIL_AND_PASSWORD);
+        }
+    }
+
+    public void updatePassword(String password, Function<String, String> encodeFunction) {
+        this.password = encodeFunction.apply(password);
+    }
+
+    public void validateStatus() {
+        if (this.userStatus == UserStatus.DELETED) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.DELETED_USER);
         }
     }
 }
