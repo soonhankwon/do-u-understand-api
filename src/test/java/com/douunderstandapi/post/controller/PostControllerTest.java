@@ -7,6 +7,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -25,6 +26,7 @@ import com.douunderstandapi.post.dto.response.PostGetResponse;
 import com.douunderstandapi.post.dto.response.PostUpdateResponse;
 import com.douunderstandapi.post.service.PostService;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
@@ -56,10 +58,12 @@ class PostControllerTest {
         String title = "RESTful API";
         String content = "Restful API란.....";
         String link = "https://abcdefssss/2in2";
+        List<String> categoryNames = List.of("java");
         JSONObject request = new JSONObject();
         request.put("title", title);
         request.put("content", content);
         request.put("link", link);
+        request.put("categoryNames", categoryNames);
 
         when(postService.addPost(anyString(), any(PostAddRequest.class)))
                 .thenReturn(createPostAddResponse(title, content, link));
@@ -79,7 +83,8 @@ class PostControllerTest {
                                 requestFields(
                                         fieldWithPath("title").type(STRING).description("제목"),
                                         fieldWithPath("content").type(STRING).description("컨텐츠"),
-                                        fieldWithPath("link").type(STRING).description("관련링크")
+                                        fieldWithPath("link").type(STRING).description("관련링크"),
+                                        fieldWithPath("categoryNames").type(ARRAY).description("카테고리 목록")
                                 ),
                                 responseFields(
                                         fieldWithPath("id")
@@ -93,7 +98,10 @@ class PostControllerTest {
                                                 .description("컨텐츠"),
                                         fieldWithPath("link")
                                                 .type(STRING)
-                                                .description("관련링크")
+                                                .description("관련링크"),
+                                        fieldWithPath("categoryName")
+                                                .type(STRING)
+                                                .description("카테고리 이름")
                                 )
                         )
                 )
@@ -240,7 +248,7 @@ class PostControllerTest {
     }
 
     private PostAddResponse createPostAddResponse(String title, String content, String link) {
-        return PostAddResponse.of(1L, title, content, link);
+        return PostAddResponse.of(1L, "test@gmail.com", title, content, link, "java");
     }
 
     private PostGetResponse createPostGetResponse(String title, String content, String link) {

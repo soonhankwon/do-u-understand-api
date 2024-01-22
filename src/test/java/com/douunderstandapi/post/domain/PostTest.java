@@ -3,12 +3,13 @@ package com.douunderstandapi.post.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.douunderstandapi.category.domain.Category;
 import com.douunderstandapi.common.exception.CustomException;
 import com.douunderstandapi.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("지식 도메인 클래스 단위 테스트")
+@DisplayName("포스트 도메인 클래스 단위 테스트")
 class PostTest {
 
     @Test
@@ -19,8 +20,9 @@ class PostTest {
         String title = "함수 네이밍 룰 컨벤션";
         String content = "GET 요청을 처리하는 메서드의 네이밍 규칭......";
         String link = "https://sdnksnd/sds123";
+        Category category = new Category("java");
 
-        Post post = Post.of(title, content, link, createUser(email));
+        Post post = Post.of(title, content, link, createUser(email), category);
 
         assertThat(post.getContent()).isEqualTo(content);
     }
@@ -33,8 +35,9 @@ class PostTest {
         String title = "함수 네이밍 룰 컨벤션";
         String content = "GET 요청을 처리하는 메서드의 네이밍 규칭......";
         String link = "https://sdnksnd/sds123";
+        Category category = new Category("java");
 
-        Post post = Post.of(title, content, link, createUser(email1));
+        Post post = Post.of(title, content, link, createUser(email1), category);
 
         assertThatThrownBy(() -> post.validateAccessAuth(createUser(email2)))
                 .isInstanceOf(CustomException.class);
@@ -50,8 +53,9 @@ class PostTest {
         String content = "GET 요청을 처리하는 메서드의 네이밍 규칭......";
         String link = "https://sdnksnd/sds123";
         User mockUser = createUser(email);
+        Category category = new Category("java");
 
-        Post post = Post.of(title, content, link, mockUser);
+        Post post = Post.of(title, content, link, mockUser, category);
 
         assertThat(post.getId()).isNull();
         assertThat(post.getTitle()).isEqualTo(title);
