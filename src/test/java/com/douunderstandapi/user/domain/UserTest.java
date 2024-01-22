@@ -1,9 +1,12 @@
 package com.douunderstandapi.user.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.douunderstandapi.common.exception.CustomException;
 import com.douunderstandapi.user.enumType.UserStatus;
 import java.time.LocalDateTime;
+import java.util.function.BiFunction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -45,6 +48,30 @@ class UserTest {
         assertThat(user.getEmail()).isEqualTo(email);
         assertThat(user.getIsAuthenticated()).isTrue();
         assertThat(user.getIsAllowedNotification()).isTrue();
+    }
+
+    @Test
+    void validatePassword() {
+        String email = "test@gmail.com";
+        String password = "password1!";
+        String wrongPassword = "password";
+        User user = createUser(email, password);
+
+        BiFunction<String, String, Boolean> mockMatchesFunction = String::equals;
+
+        assertThatThrownBy(() -> user.validatePassword(wrongPassword, mockMatchesFunction))
+                .isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void validateStatus() {
+        String email = "test@gmail.com";
+        String password = "password1!";
+        User user = createUser(email, password);
+        user.delete();
+
+        assertThatThrownBy(user::validateStatus)
+                .isInstanceOf(CustomException.class);
     }
 
     private User createUser(String email, String password) {
