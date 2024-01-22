@@ -8,12 +8,15 @@ import com.douunderstandapi.comment.dto.response.CommentAddResponse;
 import com.douunderstandapi.comment.dto.response.CommentDeleteResponse;
 import com.douunderstandapi.comment.dto.response.CommentsGetResponse;
 import com.douunderstandapi.comment.repository.CommentRepository;
+import com.douunderstandapi.common.enumtype.ErrorCode;
+import com.douunderstandapi.common.exception.CustomException;
 import com.douunderstandapi.post.domain.Post;
 import com.douunderstandapi.post.repository.PostRepository;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,9 +28,9 @@ public class CommentService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    public CommentsGetResponse getComments(String email, Long articleId) {
-        Post post = postRepository.findById(articleId)
-                .orElseThrow(() -> new IllegalArgumentException("invalid articleId"));
+    public CommentsGetResponse getComments(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_POST_ID));
 
         List<CommentDTO> commentDTOs = commentRepository.findAllByPost(post)
                 .stream()
@@ -40,10 +43,10 @@ public class CommentService {
     @Transactional
     public CommentAddResponse addComment(String email, CommentAddRequest commentAddRequest) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("invalid email"));
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
         Post post = postRepository.findById(commentAddRequest.postId())
-                .orElseThrow(() -> new IllegalArgumentException("invalid postId"));
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_POST_ID));
 
         Comment comment = commentAddRequest.toEntity(commentAddRequest, user, post);
         commentRepository.save(comment);
@@ -54,10 +57,10 @@ public class CommentService {
     @Transactional
     public CommentDeleteResponse deleteComment(String email, CommentDeleteRequest request) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("invalid email"));
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
         Comment comment = commentRepository.findByIdAndUser(request.commentId(), user)
-                .orElseThrow(() -> new IllegalArgumentException("not users comment"));
+                .orElseThrow(() -> new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_ACCESS));
 
         commentRepository.delete(comment);
         return CommentDeleteResponse.from(comment);
