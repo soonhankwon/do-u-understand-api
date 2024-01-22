@@ -1,5 +1,6 @@
 package com.douunderstandapi.post.dto.response;
 
+import com.douunderstandapi.category.domain.Category;
 import com.douunderstandapi.post.domain.Post;
 import lombok.Builder;
 
@@ -13,9 +14,10 @@ public record PostUpdateResponse(
         String createdAt,
         Long userId,
         String userEmail,
+        String categoryName,
         Boolean subscribeMe
 ) {
-    public static PostUpdateResponse of(Post post, boolean subscribeMe) {
+    public static PostUpdateResponse of(Post post, Category category, boolean subscribeMe) {
         return PostUpdateResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -25,6 +27,7 @@ public record PostUpdateResponse(
                 .createdAt(post.getCreatedAt().toString())
                 .userId(post.getUser().getId())
                 .userEmail(post.getUser().getEmail())
+                .categoryName(category.getName())
                 .subscribeMe(subscribeMe)
                 .build();
     }
