@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import com.douunderstandapi.category.domain.Category;
 import com.douunderstandapi.common.exception.CustomException;
 import com.douunderstandapi.post.domain.Post;
 import com.douunderstandapi.post.dto.request.PostAddRequest;
@@ -14,6 +15,7 @@ import com.douunderstandapi.post.dto.response.PostAddResponse;
 import com.douunderstandapi.post.repository.PostRepository;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.repository.UserRepository;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,16 +37,17 @@ class PostServiceTest {
     private PostService postService;
 
     @Test
-    @DisplayName("지식 생성 - 서비스 로직 테스트")
-    void addKnowledge() {
+    @DisplayName("포스트 생성 - 서비스 로직 테스트")
+    void addPost() {
         when(postRepository.save(any(Post.class))).thenReturn(createKnowledge());
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(createUser()));
         String title = "함수 네이밍 룰 컨벤션";
         String content = "GET 요청을 처리하는 메서드의 네이밍 규칭......";
         String email = "test@gmail.com";
         String link = "https://sdnksnd/sds123";
+        String categoryName = "programming";
 
-        PostAddRequest request = createPostAddRequest(title, content, link);
+        PostAddRequest request = createPostAddRequest(title, content, link, categoryName);
 
         PostAddResponse response = postService.addPost(email, request);
 
@@ -52,15 +55,16 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("지식 생성 - 유저 email 미존재 예외처리")
-    void addKnowledge_user_email_not_exist_exception() {
+    @DisplayName("포스트 생성 - 유저 email 미존재 예외처리")
+    void addPost_user_email_not_exist_exception() {
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
         String title = "함수 네이밍 룰 컨벤션";
         String content = "GET 요청을 처리하는 메서드의 네이밍 규칭......";
         String email = "test@gmail.com";
         String link = "https://sdnksnd/sds123";
+        String categoryName = "programming";
 
-        PostAddRequest request = createPostAddRequest(title, content, link);
+        PostAddRequest request = createPostAddRequest(title, content, link, categoryName);
 
         assertThatThrownBy(() ->
                 postService.addPost(email, request))
@@ -68,8 +72,8 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("지식 상세조회(단건) - 자신의 지식이 아닌것을 조회하는 경우 Exception")
-    void findKnowledge_not_my_knowledge() {
+    @DisplayName("포스트 상세조회(단건) - 자신의 지식이 아닌것을 조회하는 경우 Exception")
+    void findPost_not_my_post() {
         String email = "test@gmail.com";
         when(postRepository.findById(any(Long.class))).thenReturn(Optional.of(createKnowledge()));
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(createUser()));
@@ -79,8 +83,8 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("지식 업데이트 - 자신의 지식이 아닌것을 업데이트하는 경우 Exception")
-    void updateKnowledge() {
+    @DisplayName("포스트 업데이트 - 자신의 지식이 아닌것을 업데이트하는 경우 Exception")
+    void updatePost() {
         String email = "test@gmail.com";
         when(postRepository.findById(any(Long.class))).thenReturn(Optional.of(createKnowledge()));
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(createUser()));
@@ -93,8 +97,8 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("지식 삭제 - 자신의 지식이 아닌것을 삭제하는 경우 Exception")
-    void deleteKnowledge() {
+    @DisplayName("포스트 삭제 - 자신의 지식이 아닌것을 삭제하는 경우 Exception")
+    void deletePost() {
         String email = "test@gmail.com";
         when(postRepository.findById(any(Long.class))).thenReturn(Optional.of(createKnowledge()));
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(createUser()));
@@ -103,14 +107,15 @@ class PostServiceTest {
                 .isInstanceOf(CustomException.class);
     }
 
-    private PostAddRequest createPostAddRequest(String title, String content, String link) {
-        return new PostAddRequest(title, content, link);
+    private PostAddRequest createPostAddRequest(String title, String content, String link, String categoryName) {
+        return new PostAddRequest(title, content, link, List.of(categoryName));
     }
 
     private Post createKnowledge() {
         return Post.of("함수 네이밍 룰 컨벤션",
                 "GET 요청을 처리하는 메서드의 네이밍 규칭......",
-                "https://sdnksnd/sds123", createUser());
+                "https://sdnksnd/sds123", createUser(),
+                new Category("java"));
     }
 
     private User createUser() {
