@@ -1,5 +1,6 @@
 package com.douunderstandapi.post.domain;
 
+import com.douunderstandapi.category.domain.Category;
 import com.douunderstandapi.common.enumtype.ErrorCode;
 import com.douunderstandapi.common.exception.CustomException;
 import com.douunderstandapi.post.dto.request.PostUpdateRequest;
@@ -13,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -50,20 +52,25 @@ public class Post {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @OneToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     private LocalDateTime createdAt;
 
-    private Post(String title, String content, String link, User user) {
+    private Post(String title, String content, String link, User user, Category category) {
         this.title = title;
         this.content = content;
         this.link = link;
         this.notificationCount = 0;
         this.postStatus = PostStatus.GENERAL;
         this.user = user;
+        this.category = category;
         this.createdAt = LocalDateTime.now();
     }
 
-    public static Post of(String title, String content, String link, User user) {
-        return new Post(title, content, link, user);
+    public static Post of(String title, String content, String link, User user, Category category) {
+        return new Post(title, content, link, user, category);
     }
 
     public void update(PostUpdateRequest request) {
