@@ -9,7 +9,7 @@ public record PostAddRequest(
         String title,
         String content,
         String link,
-        List<String> categoriesName
+        List<String> categoryNames
 ) {
     public Post toEntity(User user, Category category) {
         return Post.of(
