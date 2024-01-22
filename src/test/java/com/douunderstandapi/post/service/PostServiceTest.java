@@ -90,7 +90,7 @@ class PostServiceTest {
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(createUser()));
 
         PostUpdateRequest request = new PostUpdateRequest("RESTful API 수정본", "수정된 버전의 내용",
-                "https://mock-link");
+                "https://mock-link", "java");
 
         assertThatThrownBy(() -> postService.update(email, 1L, request))
                 .isInstanceOf(CustomException.class);
