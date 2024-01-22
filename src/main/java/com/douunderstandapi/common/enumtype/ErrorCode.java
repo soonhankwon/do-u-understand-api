@@ -24,6 +24,7 @@ public enum ErrorCode {
     DUPLICATED_SUBSCRIBE(4012, "중복된 구독 요청입니다."),
     INVALID_ACCESS(4013, "권한이 없습니다."),
     DELETED_USER(4014, "탈퇴한 이메일입니다. 다시 회원가입을 해주세요."),
+    DUPLICATED_EMAIL(4015, "이미 가입된 이메일입니다."),
 
     //500
     UNKNOWN(5000, "서버 내부 에러가 발생했습니다."),

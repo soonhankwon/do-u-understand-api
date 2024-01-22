@@ -3,7 +3,6 @@ package com.douunderstandapi.user.service;
 import com.douunderstandapi.auth.repository.redis.AuthEmailCodeRepository;
 import com.douunderstandapi.common.enumtype.ErrorCode;
 import com.douunderstandapi.common.exception.CustomException;
-import com.douunderstandapi.common.utils.mail.EmailUtils;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.dto.request.UserAddRequest;
 import com.douunderstandapi.user.dto.request.UserPasswordUpdateRequest;
@@ -22,19 +21,23 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final EmailUtils emailUtils;
     private final AuthEmailCodeRepository authEmailCodeRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserAddResponse addUser(UserAddRequest request) {
         String email = request.email();
+        if (userRepository.existsByEmail(email)) {
+            throw new CustomException(HttpStatus.CONFLICT, ErrorCode.DUPLICATED_EMAIL);
+        }
         //test
+
         if (request.code().equals("1")) {
             User user = request.toEntity(passwordEncoder::encode);
             userRepository.save(user);
             return UserAddResponse.from(user);
         }
+
         String inputCode = request.code();
         //TODO inputCode validation 은 DTO 에서 하도록 수정 Early Exception
         if (inputCode == null || inputCode.isEmpty()) {
