@@ -87,6 +87,8 @@ class UserServiceTest {
         String email = "test@gmail.com";
         String authCode = UUID.randomUUID().toString();
 
+        when(authEmailCodeRepository.get(anyString()))
+                .thenReturn(Optional.of(authCode));
         when(userRepository.findByEmail(anyString()))
                 .thenReturn(Optional.of(createUser()));
 
