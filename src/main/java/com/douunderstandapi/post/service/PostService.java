@@ -88,13 +88,23 @@ public class PostService {
 
         // 자신이 작성한 지식이 아니라면 업데이트 거부
         post.validateAccessAuth(user);
-        post.update(request);
+
+        Category category;
+        String categoryName = request.categoryName();
+        Optional<Category> optionalCategory = categoryRepository.findByName(categoryName);
+        if (optionalCategory.isPresent()) {
+            category = optionalCategory.get();
+        } else {
+            category = new Category(categoryName);
+            categoryRepository.save(category);
+        }
+        post.update(request, category);
 
         Optional<Subscribe> optionalSubscribe = subscribeRepository.findByUserAndPost(user, post);
         if (optionalSubscribe.isPresent()) {
-            return PostUpdateResponse.of(post, true);
+            return PostUpdateResponse.of(post, category, true);
         }
-        return PostUpdateResponse.of(post, false);
+        return PostUpdateResponse.of(post, category, false);
     }
 
     public Boolean delete(String email, Long postId) {
