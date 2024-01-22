@@ -1,5 +1,8 @@
 package com.douunderstandapi.post.service;
 
+import com.douunderstandapi.category.domain.Category;
+import com.douunderstandapi.category.repository.CategoryRepository;
+import com.douunderstandapi.comment.repository.CommentRepository;
 import com.douunderstandapi.common.enumtype.ErrorCode;
 import com.douunderstandapi.common.exception.CustomException;
 import com.douunderstandapi.post.domain.Post;
@@ -35,15 +38,26 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final SubscribeRepository subscribeRepository;
+    private final CategoryRepository categoryRepository;
+    private final CommentRepository commentRepository;
 
     public PostAddResponse addPost(String email, PostAddRequest request) {
         User user = userRepository
                 .findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
-        Post post = request.toEntity(user);
-        postRepository.save(post);
+        String categoryName = request.categoryNames().getFirst();
+        Category category;
+        Optional<Category> optionalCategory = categoryRepository.findByName(categoryName);
+        if (optionalCategory.isPresent()) {
+            category = optionalCategory.get();
+        } else {
+            category = new Category(categoryName);
+            categoryRepository.save(category);
+        }
 
+        Post post = request.toEntity(user, category);
+        postRepository.save(post);
         return PostAddResponse.from(post);
     }
 
@@ -58,8 +72,10 @@ public class PostService {
 
         // 자신이 작성한 지식이 아니라면 조회 거부
         post.validateAccessAuth(user);
+        Long count = commentRepository.countAllByPost(post);
+        assert count != null;
 
-        return PostGetResponse.from(post);
+        return PostGetResponse.of(post, count);
     }
 
     public PostUpdateResponse update(String email, Long postId, PostUpdateRequest request) {
@@ -119,11 +135,12 @@ public class PostService {
     private List<PostDTO> getPostDTO(List<Post> posts, User user) {
         return posts.stream()
                 .map(p -> {
+                    Long commentCount = commentRepository.countAllByPost(p);
                     Optional<Subscribe> optionalSubscribe = subscribeRepository.findByUserAndPost(user, p);
                     if (optionalSubscribe.isPresent()) {
-                        return PostDTO.of(p, true);
+                        return PostDTO.of(p, commentCount, true);
                     } else {
-                        return PostDTO.of(p, false);
+                        return PostDTO.of(p, commentCount, false);
                     }
                 })
                 .collect(Collectors.toList());

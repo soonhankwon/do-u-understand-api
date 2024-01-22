@@ -12,9 +12,10 @@ public record PostGetResponse(
         String content,
         String link,
         String createdAt,
-        Long commentCount
+        Long commentCount,
+        String categoryName
 ) {
-    public static PostGetResponse from(Post post) {
+    public static PostGetResponse of(Post post, Long commentCount) {
         return new PostGetResponse(
                 post.getId(),
                 post.getUser().getId(),
@@ -23,7 +24,8 @@ public record PostGetResponse(
                 post.getContent(),
                 post.getLink(),
                 post.getCreatedAt().toString(),
-                1L
+                commentCount,
+                post.getCategory().getName()
         );
     }
 }

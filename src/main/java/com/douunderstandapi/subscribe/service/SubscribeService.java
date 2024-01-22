@@ -1,5 +1,6 @@
 package com.douunderstandapi.subscribe.service;
 
+import com.douunderstandapi.comment.repository.CommentRepository;
 import com.douunderstandapi.common.enumtype.ErrorCode;
 import com.douunderstandapi.common.exception.CustomException;
 import com.douunderstandapi.post.domain.Post;
@@ -30,6 +31,7 @@ public class SubscribeService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final SubscribeRepository subscribeRepository;
+    private final CommentRepository commentRepository;
 
     public SubscribePostsGetResponse getSubscribePosts(String email, int pageNumber) {
         User user = userRepository.findByEmail(email)
@@ -41,7 +43,11 @@ public class SubscribeService {
         List<PostDTO> postDTOS = page.getContent()
                 .stream()
                 .map(Subscribe::getPost)
-                .map(p -> PostDTO.of(p, true))
+                .map(p -> {
+                    Long commentCount = commentRepository.countAllByPost(p);
+                    assert commentCount != null;
+                    return PostDTO.of(p, commentCount, true);
+                })
                 .collect(Collectors.toList());
 
         int totalPages = page.getTotalPages();
