@@ -46,6 +46,7 @@ public class AuthService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
+        user.validateStatus();
         user.validatePassword(request.password(), passwordEncoder::matches);
 
         String email = user.getEmail();
