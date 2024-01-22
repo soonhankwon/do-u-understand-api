@@ -7,7 +7,6 @@ import com.douunderstandapi.comment.dto.response.CommentDeleteResponse;
 import com.douunderstandapi.comment.dto.response.CommentsGetResponse;
 import com.douunderstandapi.comment.service.CommentService;
 import com.douunderstandapi.common.security.impl.UserDetailsImpl;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,19 +27,14 @@ public class CommentController {
 
 
     @GetMapping("/{postId}")
-    public ResponseEntity<CommentsGetResponse> getComments(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                           @PathVariable Long postId,
-                                                           HttpServletRequest httpServletRequest) {
-        String email = getEmailFromUserDetails(userDetails);
-
-        CommentsGetResponse res = commentService.getComments(email, postId);
+    public ResponseEntity<CommentsGetResponse> getComments(@PathVariable Long postId) {
+        CommentsGetResponse res = commentService.getComments(postId);
         return ResponseEntity.ok().body(res);
     }
 
     @PostMapping
     public ResponseEntity<CommentAddResponse> addComment(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                         @RequestBody CommentAddRequest commentAddRequest,
-                                                         HttpServletRequest httpServletRequest) {
+                                                         @RequestBody CommentAddRequest commentAddRequest) {
         String email = getEmailFromUserDetails(userDetails);
         CommentAddResponse res = commentService.addComment(email, commentAddRequest);
         return ResponseEntity.ok().body(res);
