@@ -1,0 +1,17 @@
+=== 로그아웃 API
+
+==== 1. Curl Request
+
+include::{snippets}/auth-logout/curl-request.adoc[]
+
+==== 2. HTTP Request
+
+include::{snippets}/auth-logout/http-request.adoc[]
+
+==== 3. HTTP Request Body
+
+include::{snippets}/auth-logout/request-body.adoc[]
+
+==== 4. HTTP Response Body
+
+include::{snippets}/auth-logout/response-body.adoc[]
