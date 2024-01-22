@@ -1,16 +1,25 @@
 package com.douunderstandapi.auth.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import com.douunderstandapi.auth.dto.request.AuthEmailRequest;
 import com.douunderstandapi.auth.dto.request.AuthLoginRequest;
+import com.douunderstandapi.auth.dto.response.AuthEmailResponse;
 import com.douunderstandapi.auth.dto.response.AuthLoginResponse;
+import com.douunderstandapi.common.exception.CustomException;
 import com.douunderstandapi.common.utils.jwt.JwtProvider;
+import com.douunderstandapi.common.utils.mail.EmailUtils;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.repository.UserRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +45,9 @@ class AuthServiceTest {
 
     @Mock
     private JwtProvider jwtProvider;
+
+    @Mock
+    private EmailUtils emailUtils;
 
     @InjectMocks
     private AuthService authService;
@@ -86,14 +98,73 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("토큰 재발급 - 헤더에 새로운 AccessToken 검증")
     void refresh() {
+        String email = "test@gmail.com";
+        String password = "password1!";
+        User user = User.of(email, password, true);
+
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+        mockHttpServletRequest.setCookies(new Cookie("refresh_token", UUID.randomUUID().toString()));
+
+        when(jwtProvider.getClaims(anyString()))
+                .thenReturn(createClaims(email));
+        when(userRepository.findByEmail(anyString()))
+                .thenReturn(Optional.of(user));
+        String accessToken = UUID.randomUUID().toString();
+        when(jwtProvider.createAccessToken(any(), anyString()))
+                .thenReturn(accessToken);
+
+        AuthLoginResponse response = authService.refresh(mockHttpServletRequest, mockHttpServletResponse);
+
+        assertThat(response.email()).isEqualTo(email);
+        assertThat(Objects.requireNonNull(mockHttpServletResponse.getHeader(HttpHeaders.AUTHORIZATION)))
+                .isEqualTo("Bearer " + accessToken);
+    }
+
+    @Test
+    @DisplayName("토큰 재발급 - request의 Cookies 배열이 null일 경우 예외처리")
+    void refresh_exception_cookie_is_null() {
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+
+        assertThatThrownBy(() -> authService.refresh(mockHttpServletRequest, mockHttpServletResponse))
+                .isInstanceOf(CustomException.class);
     }
 
     @Test
     void authEmail() {
+        String email = "test@gmail.com";
+        AuthEmailRequest request = new AuthEmailRequest(email);
+        String mockCode = UUID.randomUUID().toString();
+        when(emailUtils.sendEmailAuthMessage(anyString()))
+                .thenReturn(mockCode);
+
+        AuthEmailResponse response = authService.authEmail(request);
+
+        assertThat(response.code()).isEqualTo(mockCode);
     }
 
     @Test
     void getClaims() {
+        String email = "test@gmail.com";
+        String accessToken = UUID.randomUUID().toString();
+        when(jwtProvider.getClaims(accessToken))
+                .thenReturn(createClaims(email));
+
+        Claims claims = authService.getClaims(accessToken);
+
+        assertThat(claims.getSubject()).isEqualTo(email);
+        assertThat(claims.getExpiration()).isAfter(Date.from(Instant.now()));
+    }
+
+    private Claims createClaims(String email) {
+        return Jwts.claims()
+                .id("jtl")
+                .subject(email)
+                .expiration(Date.from(Instant.now().plusSeconds(60 * 60 * 24 * 3)))
+                .issuer("test")
+                .build();
     }
 }
