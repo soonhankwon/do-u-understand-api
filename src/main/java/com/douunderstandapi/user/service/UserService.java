@@ -31,7 +31,6 @@ public class UserService {
             throw new CustomException(HttpStatus.CONFLICT, ErrorCode.DUPLICATED_EMAIL);
         }
         //test
-
         if (request.code().equals("1")) {
             User user = request.toEntity(passwordEncoder::encode);
             userRepository.save(user);
@@ -73,6 +72,7 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
         // soft delete
         user.delete();
+        authEmailCodeRepository.delete(email);
         return UserDeleteResponse.from(user);
     }
 
@@ -91,6 +91,7 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
         user.updatePassword(request.password(), passwordEncoder::encode);
+        authEmailCodeRepository.delete(email);
         return UserPasswordUpdateResponse.from(user);
     }
 }

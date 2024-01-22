@@ -43,14 +43,15 @@ public class AuthService {
     private final AuthEmailCodeRepository authEmailCodeRepository;
 
     public AuthLoginResponse login(AuthLoginRequest request, HttpServletResponse httpServletResponse) {
-        User user = userRepository.findByEmail(request.email())
+        String email = request.email();
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
         user.validateStatus();
         user.validatePassword(request.password(), passwordEncoder::matches);
 
-        String email = user.getEmail();
-        String accessTokenValue = jwtProvider.createAccessToken(user.getId(), email);
+        Long userId = user.getId();
+        String accessTokenValue = jwtProvider.createAccessToken(userId, email);
         String accessToken = JWT_PREFIX + accessTokenValue;
         httpServletResponse.setHeader(HttpHeaders.AUTHORIZATION, accessToken);
 
@@ -58,7 +59,7 @@ public class AuthService {
         ResponseCookie cookie = createCookie(refreshToken, COOKIE_MAX_AGE);
 
         httpServletResponse.setHeader("Set-Cookie", cookie.toString());
-        return new AuthLoginResponse(user.getId(), email, accessToken);
+        return new AuthLoginResponse(userId, email, accessToken);
     }
 
     public Boolean logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
