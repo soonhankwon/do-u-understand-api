@@ -6,8 +6,10 @@ import com.douunderstandapi.common.exception.CustomException;
 import com.douunderstandapi.common.utils.mail.EmailUtils;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.dto.request.UserAddRequest;
+import com.douunderstandapi.user.dto.request.UserPasswordUpdateRequest;
 import com.douunderstandapi.user.dto.response.UserAddResponse;
 import com.douunderstandapi.user.dto.response.UserDeleteResponse;
+import com.douunderstandapi.user.dto.response.UserPasswordUpdateResponse;
 import com.douunderstandapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,7 @@ public class UserService {
 
     @Transactional
     public UserAddResponse addUser(UserAddRequest request) {
+        String email = request.email();
         //test
         if (request.code().equals("1")) {
             User user = request.toEntity(passwordEncoder::encode);
@@ -38,7 +41,6 @@ public class UserService {
             throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_AUTH_CODE);
         }
         // Redis Cache 에서 인증코드를 찾고 없다면 exception
-        String email = request.email();
         String code = authEmailCodeRepository
                 .get(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_AUTH_CODE));
@@ -54,12 +56,38 @@ public class UserService {
         return UserAddResponse.from(user);
     }
 
-    public UserDeleteResponse deleteUser(String email) {
+    @Transactional
+    public UserDeleteResponse deleteUser(String email, String authCode) {
+        String code = authEmailCodeRepository
+                .get(email)
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_AUTH_CODE));
+
+        if (!authCode.equals(code)) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_AUTH_CODE);
+        }
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
-
         // soft delete
         user.delete();
         return UserDeleteResponse.from(user);
+    }
+
+    @Transactional
+    public UserPasswordUpdateResponse updatePassword(String email, UserPasswordUpdateRequest request) {
+        String code = authEmailCodeRepository
+                .get(email)
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_AUTH_CODE));
+
+        String inputCode = request.authCode();
+        if (!inputCode.equals(code)) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_AUTH_CODE);
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
+
+        user.updatePassword(request.password(), passwordEncoder::encode);
+        return UserPasswordUpdateResponse.from(user);
     }
 }
