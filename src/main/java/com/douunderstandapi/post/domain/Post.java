@@ -73,13 +73,12 @@ public class Post {
         return new Post(title, content, link, user, category);
     }
 
-    public void update(PostUpdateRequest request) {
-        if (request == null) {
-            return;
-        }
+    public void update(PostUpdateRequest request, Category category) {
+        assert request != null;
         this.title = request.title();
         this.content = request.content();
         this.link = request.link();
+        this.category = category;
     }
 
     public void increaseNotificationCount() {
