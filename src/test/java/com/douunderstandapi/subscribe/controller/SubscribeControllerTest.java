@@ -98,6 +98,9 @@ class SubscribeControllerTest {
                                         fieldWithPath("postList[].createdAt")
                                                 .type(STRING)
                                                 .description("작성일시"),
+                                        fieldWithPath("postList[].categoryName")
+                                                .type(STRING)
+                                                .description("카테고리 이름"),
                                         fieldWithPath("postList[].subscribeMe")
                                                 .type(BOOLEAN)
                                                 .description("구독여부")
@@ -188,6 +191,7 @@ class SubscribeControllerTest {
                 .userEmail("test@gmail.com")
                 .userId(1L)
                 .createdAt(LocalDateTime.now().toString())
+                .categoryName("java")
                 .subscribeMe(true)
                 .build();
     }
