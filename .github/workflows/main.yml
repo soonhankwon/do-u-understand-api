@@ -1,9 +1,9 @@
 name: Spring Boot & Gradle & Docker & AWS CD
 
 on:
- push:
-   branches:
-     - main
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -22,7 +22,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          
+
       # Gradle Caching
       - name: Gradle Caching
         uses: actions/cache@v3
@@ -33,20 +33,20 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-   
-            
+
       # main 설정 파일 생성 및 write
       - name: Set application.properties for main
         run: |
           # main 설정 파일 디렉토리로 이동
           cd ./src/main/resources
-          touch ./application.yml
+          touch ./application-prod.yml
           echo "${{ secrets.APPLICATION }}" >> ./application.yml
         shell: bash
 
       # Gradle build
       - name: Build with Gradle
         run: ./gradlew bootJar
-      
+
       - name: EC2 Docker Cleanup
         uses: appleboy/ssh-action@master
         with:
