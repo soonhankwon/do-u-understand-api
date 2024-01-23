@@ -36,7 +36,8 @@ public class SecurityConfig {
             "/api/v1/auth/**",
             "/api/v1/users",
             "/h2-console/**",
-            "/index.html"
+            "/index.html",
+            "/healthCheck"
     };
 
     @Bean
@@ -78,6 +79,7 @@ public class SecurityConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedOriginPatterns(List.of("*"));
         corsConfiguration.addAllowedOrigin("http://localhost:5173");
+        corsConfiguration.addAllowedOrigin("https://do-u-understand-web.vercel.app");
         corsConfiguration.setAllowedMethods(Arrays.asList("POST", "GET", "DELETE", "PATCH", "PUT", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);
