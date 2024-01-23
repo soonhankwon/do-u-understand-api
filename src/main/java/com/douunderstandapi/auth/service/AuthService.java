@@ -124,11 +124,10 @@ public class AuthService {
     private ResponseCookie createCookie(String refreshToken, int maxAge) {
         return ResponseCookie.from(REFRESH_TOKEN_NAME, refreshToken)
                 .maxAge(maxAge)
-                .domain("localhost")
                 .path("/")
                 .secure(true)
                 .sameSite(SameSite.NONE.name())
-                .httpOnly(true)
+                .httpOnly(false)
                 .build();
     }
 }
