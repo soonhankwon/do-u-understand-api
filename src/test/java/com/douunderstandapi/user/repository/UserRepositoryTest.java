@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 // @Convert의 Converter를 DataJpaTest 시 로드하지 않아 @SpringBootTest로 테스트 진행
 @SpringBootTest
-@Transactional
 @DisplayName(value = "유저 레포지토리 테스트")
 class UserRepositoryTest {
 
@@ -21,6 +20,7 @@ class UserRepositoryTest {
     UserRepository userRepository;
 
     @Test
+    @Transactional
     void findByEmail() {
         String email = "test@gmail.com";
         User user = createUser();
@@ -33,6 +33,7 @@ class UserRepositoryTest {
     }
 
     @Test
+    @Transactional
     void findAllByIsAllowedNotification() {
         User user1 = createUser();
         User user2 = createUser();
