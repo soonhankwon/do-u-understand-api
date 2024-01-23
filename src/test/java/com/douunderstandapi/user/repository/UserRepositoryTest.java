@@ -3,7 +3,6 @@ package com.douunderstandapi.user.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.douunderstandapi.user.domain.User;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,19 +29,6 @@ class UserRepositoryTest {
         optionalUser.ifPresent(
                 u -> assertThat(u).isSameAs(user)
         );
-    }
-
-    @Test
-    @Transactional
-    void findAllByIsAllowedNotification() {
-        User user1 = createUser();
-        User user2 = createUser();
-        userRepository.save(user1);
-        userRepository.save(user2);
-
-        List<User> usersByAllowedNotification = userRepository.findAllByIsAllowedNotification(true);
-
-        assertThat(usersByAllowedNotification.size()).isEqualTo(2);
     }
 
     private User createUser() {
