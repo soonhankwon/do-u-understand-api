@@ -3,7 +3,7 @@ name: Spring Boot & Gradle & Docker & AWS CD
 on:
  push:
    branches:
-     - master
+     - main
 
 permissions:
   contents: read
