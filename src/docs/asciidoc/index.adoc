@@ -1,5 +1,5 @@
 ifndef::snippets[]
-:snippets: ../build/generated-snippets
+:snippets: ../../build/generated-snippets
 endif::[]
 = API 명세서
 :doctype: book
@@ -21,8 +21,7 @@ include::api/auth/auth-refresh.adoc[]
 
 == 회원 관련 API
 
-include::api/user/create-user.adoc[]
-include::api/user/auth-user-email.adoc[]
+include::api/user/add-user.adoc[]
 include::api/user/delete-user.adoc[]
 
 == 포스트 관련 API
