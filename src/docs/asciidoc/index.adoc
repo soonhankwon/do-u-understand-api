@@ -1,6 +1,6 @@
-// ifndef::snippets[]
-// :snippets: ../../build/generated-snippets
-// endif::[]
+ifndef::snippets[]
+:snippets: ../../build/generated-snippets
+endif::[]
 = API 명세서
 :doctype: book
 :icons: font
@@ -13,26 +13,26 @@
 
 == 커스텀 에러
 
-= 인증 관련 API
+== 인증 관련 API
 
 include::api/auth/auth-login.adoc[]
 include::api/auth/auth-email.adoc[]
 include::api/auth/auth-refresh.adoc[]
 
-= 회원 관련 API
+== 회원 관련 API
 
 include::api/user/create-user.adoc[]
 include::api/user/auth-user-email.adoc[]
 include::api/user/delete-user.adoc[]
 
-= 포스트 관련 API
+== 포스트 관련 API
 
 include::api/post/add-post.adoc[]
 include::api/post/get-post.adoc[]
 include::api/post/update-post.adoc[]
 include::api/post/delete-post.adoc[]
 
-= 포스트 구독 관련 API
+== 포스트 구독 관련 API
 
 include::api/subscribe/get-subscribe-posts.adoc[]
 include::api/subscribe/add-subscribe.adoc[]
