@@ -43,13 +43,17 @@ jobs:
           echo "${{ secrets.APPLICATION }}" >> ./application.yml
         shell: bash
 
-      # Gradle build
+      # Gradle 빌드 실행
       - name: Build with Gradle
-        run: ./gradlew bootJar
+        run: ./gradlew build
 
-      # Run Asciidoctor
-      - name: Run Asciidoctor
+      # Asciidoctor 실행
+      - name: Generate Asciidoctor Documentation
         run: ./gradlew asciidoctor
+
+      # BootJar
+      - name: BootJar with Gradle
+        run: ./gradlew bootJar
 
       - name: EC2 Docker Cleanup
         uses: appleboy/ssh-action@master
