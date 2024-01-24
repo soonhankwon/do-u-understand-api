@@ -55,7 +55,7 @@ dependencies {
 }
 
 ext {
-    set('snippetsDir', file("build/generated-snippets"))
+    snippetsDir = file('build/generated-snippets') // 스니펫이 생성되는 디렉터리 경로를 설정
 }
 
 test {
