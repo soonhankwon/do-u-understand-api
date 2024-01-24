@@ -41,22 +41,27 @@ class AuthLoginRequestTest {
     }
 
     @Test
-    void validate_invalid_email_null_or_empty() {
+    void validate_invalid_email_null_or_empty_regex() {
         String empty = "";
         String blank = " ";
         String password = "password1!";
+        String wrongEmail = "wrong";
 
         AuthLoginRequest request1 = new AuthLoginRequest(empty, password);
         AuthLoginRequest request2 = new AuthLoginRequest(blank, password);
+        AuthLoginRequest request3 = new AuthLoginRequest(wrongEmail, password);
 
         Validator validator = validatorFactory.getValidator();
         Set<ConstraintViolation<AuthLoginRequest>> result1 =
                 validator.validate(request1);
         Set<ConstraintViolation<AuthLoginRequest>> result2 =
                 validator.validate(request2);
+        Set<ConstraintViolation<AuthLoginRequest>> result3 =
+                validator.validate(request3);
 
         assertThat(result1.size()).isEqualTo(1);
         assertThat(result2.size()).isEqualTo(2);
+        assertThat(result3.size()).isEqualTo(1);
     }
 
     @Test
