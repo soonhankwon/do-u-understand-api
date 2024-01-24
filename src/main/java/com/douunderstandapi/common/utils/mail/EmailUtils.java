@@ -78,7 +78,7 @@ public class EmailUtils {
         return String.format("<html><body style=\"font-family: 'Arial', sans-serif;\">"
                 + "<div style=\"background-color: #F4F4F4; padding: 30px; border-radius: 10px;\">"
                 + "<h1 style=\"font-size: 24px; color: #333;\">[회원가입 인증 코드]%s</h1>"
-                + "<p style=\"font-size: 16px; color: #666;\">아래 인증번호를 확인해주세요.</p>"
+                + "<p style=\"font-size: 16px; color: #666;\">아래 인증번호를 확인 후 복사해서 입력해주세요.</p>"
                 + "%s"
                 + "</td></tr></tbody></table></div></body></html>", DOMAIN_NAME, code);
     }

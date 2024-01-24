@@ -36,7 +36,7 @@ public class UserController {
     @PutMapping("/update")
     public ResponseEntity<UserPasswordUpdateResponse> updatePassword(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestBody UserPasswordUpdateRequest request) {
+            @Validated @RequestBody UserPasswordUpdateRequest request) {
         String email = userDetails.getUsername();
         UserPasswordUpdateResponse response = userService.updatePassword(email, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
