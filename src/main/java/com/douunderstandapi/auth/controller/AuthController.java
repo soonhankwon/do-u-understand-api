@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,7 +24,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthLoginResponse> login(@RequestBody AuthLoginRequest request,
+    public ResponseEntity<AuthLoginResponse> login(@Validated @RequestBody AuthLoginRequest request,
                                                    HttpServletResponse httpServletResponse) {
 
         AuthLoginResponse res = authService.login(request, httpServletResponse);
@@ -31,7 +32,7 @@ public class AuthController {
     }
 
     @PostMapping("/email")
-    public ResponseEntity<AuthEmailResponse> authEmail(@RequestBody AuthEmailRequest request) {
+    public ResponseEntity<AuthEmailResponse> authEmail(@Validated @RequestBody AuthEmailRequest request) {
 
         AuthEmailResponse res = authService.authEmail(request);
         return ResponseEntity.ok().body(res);
