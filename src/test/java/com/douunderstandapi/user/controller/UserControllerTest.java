@@ -53,7 +53,7 @@ class UserControllerTest {
     void addUser() throws Exception {
         JSONObject request = new JSONObject();
         request.put("email", "test@gmail.com");
-        request.put("password", "1234");
+        request.put("password", "password1!");
         request.put("code", "5b86d3dc-f0c4-4226-b684-c1ca250b7c21");
         request.put("isAllowedNotification", true);
 

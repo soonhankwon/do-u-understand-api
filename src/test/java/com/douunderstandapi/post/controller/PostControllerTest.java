@@ -7,7 +7,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -27,7 +26,6 @@ import com.douunderstandapi.post.dto.response.PostUpdateResponse;
 import com.douunderstandapi.post.service.PostService;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,17 +56,16 @@ class PostControllerTest {
         String title = "RESTful API";
         String content = "Restful API란.....";
         String link = "https://abcdefssss/2in2";
-        JSONArray categoryNames = new JSONArray();
-        categoryNames.put("java");
+        String categoryName = "java";
 
         JSONObject request = new JSONObject();
         request.put("title", title);
         request.put("content", content);
         request.put("link", link);
-        request.put("categoryNames", categoryNames);
+        request.put("categoryName", categoryName);
 
         when(postService.addPost(anyString(), any(PostAddRequest.class)))
-                .thenReturn(createPostAddResponse(title, content, link));
+                .thenReturn(createPostAddResponse(title, content, link, categoryName));
 
         mvc.perform(
                         RestDocumentationRequestBuilders.post("/api/v1/posts")
@@ -86,7 +83,7 @@ class PostControllerTest {
                                         fieldWithPath("title").type(STRING).description("제목"),
                                         fieldWithPath("content").type(STRING).description("컨텐츠"),
                                         fieldWithPath("link").type(STRING).description("관련링크"),
-                                        fieldWithPath("categoryNames").type(ARRAY).description("카테고리 목록")
+                                        fieldWithPath("categoryName").type(STRING).description("카테고리 이름")
                                 ),
                                 responseFields(
                                         fieldWithPath("id")
@@ -264,8 +261,8 @@ class PostControllerTest {
                 .andExpect(status().isOk());
     }
 
-    private PostAddResponse createPostAddResponse(String title, String content, String link) {
-        return PostAddResponse.of(1L, "test@gmail.com", title, content, link, "java");
+    private PostAddResponse createPostAddResponse(String title, String content, String link, String categoryName) {
+        return PostAddResponse.of(1L, "test@gmail.com", title, content, link, categoryName);
     }
 
     private PostGetResponse createPostGetResponse(String title, String content, String link) {
