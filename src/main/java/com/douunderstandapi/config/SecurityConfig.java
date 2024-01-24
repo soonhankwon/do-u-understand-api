@@ -36,7 +36,7 @@ public class SecurityConfig {
             "/api/v1/auth/**",
             "/api/v1/users",
             "/h2-console/**",
-            "/index.html",
+            "/docs/api-document.html",
             "/healthCheck"
     };
 
