@@ -2,8 +2,10 @@ package com.douunderstandapi.auth.controller;
 
 import com.douunderstandapi.auth.dto.request.AuthEmailRequest;
 import com.douunderstandapi.auth.dto.request.AuthLoginRequest;
+import com.douunderstandapi.auth.dto.request.AuthPasswordRefreshRequest;
 import com.douunderstandapi.auth.dto.response.AuthEmailResponse;
 import com.douunderstandapi.auth.dto.response.AuthLoginResponse;
+import com.douunderstandapi.auth.dto.response.AuthPasswordRefreshResponse;
 import com.douunderstandapi.auth.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,6 +54,14 @@ public class AuthController {
                                           HttpServletResponse httpServletResponse) {
 
         Boolean res = authService.logout(httpServletRequest, httpServletResponse);
+        return ResponseEntity.ok().body(res);
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<AuthPasswordRefreshResponse> authPasswordRefresh(
+            @Validated @RequestBody AuthPasswordRefreshRequest request) {
+
+        AuthPasswordRefreshResponse res = authService.authPasswordRefresh(request);
         return ResponseEntity.ok().body(res);
     }
 }

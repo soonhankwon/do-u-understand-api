@@ -2,8 +2,10 @@ package com.douunderstandapi.auth.service;
 
 import com.douunderstandapi.auth.dto.request.AuthEmailRequest;
 import com.douunderstandapi.auth.dto.request.AuthLoginRequest;
+import com.douunderstandapi.auth.dto.request.AuthPasswordRefreshRequest;
 import com.douunderstandapi.auth.dto.response.AuthEmailResponse;
 import com.douunderstandapi.auth.dto.response.AuthLoginResponse;
+import com.douunderstandapi.auth.dto.response.AuthPasswordRefreshResponse;
 import com.douunderstandapi.auth.repository.redis.AuthEmailCodeRepository;
 import com.douunderstandapi.common.enumtype.ErrorCode;
 import com.douunderstandapi.common.exception.CustomException;
@@ -18,6 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.server.Cookie.SameSite;
@@ -26,6 +29,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -44,6 +48,8 @@ public class AuthService {
 
     public AuthLoginResponse login(AuthLoginRequest request, HttpServletResponse httpServletResponse) {
         String email = request.email();
+        assert email != null;
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
@@ -129,5 +135,20 @@ public class AuthService {
                 .sameSite(SameSite.NONE.name())
                 .httpOnly(false)
                 .build();
+    }
+
+    @Transactional
+    public AuthPasswordRefreshResponse authPasswordRefresh(AuthPasswordRefreshRequest request) {
+        String email = request.email();
+        assert email != null;
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
+
+        String newPassword = UUID.randomUUID().toString();
+        user.updatePassword(newPassword, passwordEncoder::encode);
+
+        String code = emailUtils.sendPasswordRefreshMessage(email, newPassword);
+        return AuthPasswordRefreshResponse.of(code);
     }
 }
