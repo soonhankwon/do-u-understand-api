@@ -27,27 +27,19 @@ public class UserService {
     @Transactional
     public UserAddResponse addUser(UserAddRequest request) {
         String email = request.email();
+        assert email != null;
         if (userRepository.existsByEmail(email)) {
             throw new CustomException(HttpStatus.CONFLICT, ErrorCode.DUPLICATED_EMAIL);
         }
-        //test
-        if (request.code().equals("1")) {
-            User user = request.toEntity(passwordEncoder::encode);
-            userRepository.save(user);
-            return UserAddResponse.from(user);
-        }
 
         String inputCode = request.code();
-        //TODO inputCode validation 은 DTO 에서 하도록 수정 Early Exception
-        if (inputCode == null || inputCode.isEmpty()) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_AUTH_CODE);
-        }
+        assert inputCode != null;
         // Redis Cache 에서 인증코드를 찾고 없다면 exception
-        String code = authEmailCodeRepository
+        String authCode = authEmailCodeRepository
                 .get(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_AUTH_CODE));
 
-        if (!inputCode.equals(code)) {
+        if (isInputCodeEqualAuthCode(inputCode, authCode)) {
             throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_AUTH_CODE);
         }
 
@@ -58,13 +50,17 @@ public class UserService {
         return UserAddResponse.from(user);
     }
 
+    private boolean isInputCodeEqualAuthCode(String inputCode, String authCode) {
+        return !inputCode.equals(authCode);
+    }
+
     @Transactional
     public UserDeleteResponse deleteUser(String email, String authCode) {
         String code = authEmailCodeRepository
                 .get(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_AUTH_CODE));
 
-        if (!authCode.equals(code)) {
+        if (isInputCodeEqualAuthCode(authCode, code)) {
             throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_AUTH_CODE);
         }
 
@@ -83,7 +79,7 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_AUTH_CODE));
 
         String inputCode = request.authCode();
-        if (!inputCode.equals(code)) {
+        if (isInputCodeEqualAuthCode(inputCode, code)) {
             throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_AUTH_CODE);
         }
 

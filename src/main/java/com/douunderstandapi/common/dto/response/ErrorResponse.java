@@ -38,6 +38,14 @@ public record ErrorResponse(int code, String msg) {
                         .build());
     }
 
+    public static ResponseEntity<ErrorResponse> toResponseEntity(String message) {
+        return ResponseEntity.status(400)
+                .body(ErrorResponse.builder()
+                        .code(4000)
+                        .msg(message)
+                        .build());
+    }
+
     public static ErrorResponse from(CustomException ex) {
         return ErrorResponse.builder()
                 .code(ex.getErrorCode().getCode())
