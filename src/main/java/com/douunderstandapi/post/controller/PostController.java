@@ -62,7 +62,7 @@ public class PostController {
     @PutMapping("/{postId}")
     public ResponseEntity<PostUpdateResponse> updatePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                          @PathVariable Long postId,
-                                                         @RequestBody PostUpdateRequest request) {
+                                                         @Validated @RequestBody PostUpdateRequest request) {
         String email = getEmailFromUserDetails(userDetails);
         PostUpdateResponse response = postService.update(email, postId, request);
         return ResponseEntity.ok().body(response);

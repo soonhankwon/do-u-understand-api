@@ -10,6 +10,7 @@ import com.douunderstandapi.common.security.impl.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,7 +35,7 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<CommentAddResponse> addComment(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                         @RequestBody CommentAddRequest commentAddRequest) {
+                                                         @Validated @RequestBody CommentAddRequest commentAddRequest) {
         String email = getEmailFromUserDetails(userDetails);
         CommentAddResponse res = commentService.addComment(email, commentAddRequest);
         return ResponseEntity.ok().body(res);
@@ -42,7 +43,7 @@ public class CommentController {
 
     @DeleteMapping
     public ResponseEntity<CommentDeleteResponse> deleteComment(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                               @RequestBody CommentDeleteRequest request) {
+                                                               @Validated @RequestBody CommentDeleteRequest request) {
         String email = getEmailFromUserDetails(userDetails);
 
         CommentDeleteResponse res = commentService.deleteComment(email, request);
