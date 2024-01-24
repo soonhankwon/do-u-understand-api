@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +34,7 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<PostAddResponse> addPost(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                   @RequestBody PostAddRequest request) {
+                                                   @Validated @RequestBody PostAddRequest request) {
         String email = getEmailFromUserDetails(userDetails);
         PostAddResponse response = postService.addPost(email, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

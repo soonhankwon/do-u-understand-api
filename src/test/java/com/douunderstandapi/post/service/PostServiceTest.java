@@ -16,7 +16,6 @@ import com.douunderstandapi.post.dto.response.PostAddResponse;
 import com.douunderstandapi.post.repository.PostRepository;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.repository.UserRepository;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,7 +66,7 @@ class PostServiceTest {
     @DisplayName("포스트 생성 - 유저 email 미존재 예외처리")
     void addPost_user_email_not_exist_exception() {
         String categoryName = "programming";
-        
+
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
         String title = "함수 네이밍 룰 컨벤션";
         String content = "GET 요청을 처리하는 메서드의 네이밍 규칭......";
@@ -118,7 +117,7 @@ class PostServiceTest {
     }
 
     private PostAddRequest createPostAddRequest(String title, String content, String link, String categoryName) {
-        return new PostAddRequest(title, content, link, List.of(categoryName));
+        return new PostAddRequest(title, content, link, categoryName);
     }
 
     private Post createKnowledge() {

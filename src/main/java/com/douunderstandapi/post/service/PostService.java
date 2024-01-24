@@ -46,7 +46,9 @@ public class PostService {
                 .findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
-        String categoryName = request.categoryNames().getFirst();
+        String categoryName = request.categoryName();
+        assert categoryName != null;
+
         Category category;
         Optional<Category> optionalCategory = categoryRepository.findByName(categoryName);
         if (optionalCategory.isPresent()) {
