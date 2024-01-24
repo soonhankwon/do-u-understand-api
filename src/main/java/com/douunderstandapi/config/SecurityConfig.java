@@ -36,7 +36,7 @@ public class SecurityConfig {
             "/api/v1/auth/**",
             "/api/v1/users",
             "/h2-console/**",
-            "/docs/index.html",
+            "/index.html",
             "/healthCheck"
     };
 
@@ -69,9 +69,7 @@ public class SecurityConfig {
 
     @Bean
     public Customizer<CorsConfigurer<HttpSecurity>> customCorsConfig() {
-        return httpSecurityCorsConfigurer -> {
-            httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource());
-        };
+        return httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource());
     }
 
     @Bean
