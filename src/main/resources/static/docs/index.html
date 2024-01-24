@@ -501,8 +501,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/api/v1/auth/login' -i -X POST \
     -H 'Content-Type: application/json;charset=UTF-8' \
-    -H 'X-CSRF-TOKEN: BJ630Nwsv9VY6d2-54twybdPcUGdzNdsopx7hag1cYI71le6ZfyP5-lO2ed13O-M36ZE_IB3XCD8-ONBlv8YvJlWQeNa52SO' \
-    --cookie 'refresh_token=909d19f9-3a75-4bfd-9452-4e7d844bf5e7' \
+    -H 'X-CSRF-TOKEN: 2HjVO-FP2g6q00sFZp8H_0v24N9_7qIJ46CkSZ5-jdJOSP7z7UG0CNAsuT-HtS9gALIzzXiTzb4c1pAkgZbAfPxH6-stK8-W' \
+    --cookie 'refresh_token=21941c9c-ad98-45f2-8c86-abf161cfc581' \
     -d '{
   "password" : "password1!",
   "email" : "test@gmail.com"
@@ -517,9 +517,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/v1/auth/login HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 61
-X-CSRF-TOKEN: BJ630Nwsv9VY6d2-54twybdPcUGdzNdsopx7hag1cYI71le6ZfyP5-lO2ed13O-M36ZE_IB3XCD8-ONBlv8YvJlWQeNa52SO
+X-CSRF-TOKEN: 2HjVO-FP2g6q00sFZp8H_0v24N9_7qIJ46CkSZ5-jdJOSP7z7UG0CNAsuT-HtS9gALIzzXiTzb4c1pAkgZbAfPxH6-stK8-W
 Host: localhost:8080
-Cookie: refresh_token=909d19f9-3a75-4bfd-9452-4e7d844bf5e7
+Cookie: refresh_token=21941c9c-ad98-45f2-8c86-abf161cfc581
 
 {
   "password" : "password1!",
@@ -570,7 +570,7 @@ Cookie: refresh_token=909d19f9-3a75-4bfd-9452-4e7d844bf5e7
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{
-  "Authorization" : "5579c255-f935-43c0-8c11-9a4520cc178e",
+  "Authorization" : "a28acb1d-b1fd-4d53-9c2d-a62d4235ac30",
   "id" : 1,
   "email" : "test@gmail.com"
 }</code></pre>
@@ -710,7 +710,7 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/api/v1/auth/refresh' -i -X POST \
-    -H 'X-CSRF-TOKEN: tNUQGiUTKFUR9k18Hmd2_urCoI_5QhGFJ_gH4TR-PJ-JAmvuhuwkKxdxTGY8lX1FKUpCmIunje7PciOoRc000AVLWKzvZFyP'</code></pre>
+    -H 'X-CSRF-TOKEN: -DeoquL2whkph1ENBzcrOIq3UtbhXl6M2tHzSSFcI1-rzFBTwVbJmITF-y4EvmY8MBofW7uBf7fSOGqh7OKVeRNrQWucrWhh'</code></pre>
 </div>
 </div>
 </div>
@@ -719,7 +719,7 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/v1/auth/refresh HTTP/1.1
-X-CSRF-TOKEN: tNUQGiUTKFUR9k18Hmd2_urCoI_5QhGFJ_gH4TR-PJ-JAmvuhuwkKxdxTGY8lX1FKUpCmIunje7PciOoRc000AVLWKzvZFyP
+X-CSRF-TOKEN: -DeoquL2whkph1ENBzcrOIq3UtbhXl6M2tHzSSFcI1-rzFBTwVbJmITF-y4EvmY8MBofW7uBf7fSOGqh7OKVeRNrQWucrWhh
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -738,7 +738,7 @@ Content-Type: application/x-www-form-urlencoded</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{
-  "Authorization" : "021ac08d-559c-4319-a956-3c21f8d55427",
+  "Authorization" : "7bb63f6f-f638-428d-ad80-c1e447d1ed66",
   "id" : 1,
   "email" : "test@gmail.com"
 }</code></pre>
@@ -978,9 +978,9 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/api/v1/users/delete' -i -X PATCH \
-    -H 'Authorization: b9f690cb-68e8-425b-8bcc-77f3d73c34ac' \
-    -H 'X-CSRF-TOKEN: nAbSSTuKhWDOowcjg22wcoTCteYl5dPYjnvKxFA1nRHn2q64qTfkeli-sgbjxjUQ50CEQrOmmIcQ1Ov17Bmo9mBQ_nXQu5yP' \
-    -d 'code=614df104-03f2-4a1d-8f3b-f71c10c975f8'</code></pre>
+    -H 'Authorization: f02e46a0-7fc9-4852-b1c5-aa30d9ed5d7b' \
+    -H 'X-CSRF-TOKEN: fD3nz21hppmY4Iyi9w89dU63qpcDAODotDxFhVX2GLk1O318TFyD-F1UxKm10rvEkSIJRn3Sh_YwMtXF0A8gsGyTLIxXAh4d' \
+    -d 'code=96e9258e-707a-4fb0-b694-7874e5dfb276'</code></pre>
 </div>
 </div>
 </div>
@@ -989,13 +989,13 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PATCH /api/v1/users/delete HTTP/1.1
-Authorization: b9f690cb-68e8-425b-8bcc-77f3d73c34ac
-X-CSRF-TOKEN: nAbSSTuKhWDOowcjg22wcoTCteYl5dPYjnvKxFA1nRHn2q64qTfkeli-sgbjxjUQ50CEQrOmmIcQ1Ov17Bmo9mBQ_nXQu5yP
+Authorization: f02e46a0-7fc9-4852-b1c5-aa30d9ed5d7b
+X-CSRF-TOKEN: fD3nz21hppmY4Iyi9w89dU63qpcDAODotDxFhVX2GLk1O318TFyD-F1UxKm10rvEkSIJRn3Sh_YwMtXF0A8gsGyTLIxXAh4d
 Content-Type: application/x-www-form-urlencoded
 Host: localhost:8080
 Content-Length: 41
 
-code=614df104-03f2-4a1d-8f3b-f71c10c975f8</code></pre>
+code=96e9258e-707a-4fb0-b694-7874e5dfb276</code></pre>
 </div>
 </div>
 </div>
@@ -1003,7 +1003,7 @@ code=614df104-03f2-4a1d-8f3b-f71c10c975f8</code></pre>
 <h4 id="_3_http_request_body_6"><a class="link" href="#_3_http_request_body_6">3. HTTP Request Body</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-x-www-form-urlencoded hljs" data-lang="x-www-form-urlencoded">code=614df104-03f2-4a1d-8f3b-f71c10c975f8</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-x-www-form-urlencoded hljs" data-lang="x-www-form-urlencoded">code=96e9258e-707a-4fb0-b694-7874e5dfb276</code></pre>
 </div>
 </div>
 </div>
@@ -1060,8 +1060,8 @@ code=614df104-03f2-4a1d-8f3b-f71c10c975f8</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/api/v1/posts' -i -X POST \
     -H 'Content-Type: application/json;charset=UTF-8' \
-    -H 'Authorization: 61081c44-24b5-4aa9-b6ad-dca1e0a06a2b' \
-    -H 'X-CSRF-TOKEN: 4zW8gbPNwOG7Oluyk0Td_6iIlXDeGi3v_exI7BDZWOlT3eAl1FeJuYKs8tWWC2jRoGnpmpy5uEnoK0vCzdQtjna4b49i6IMd' \
+    -H 'Authorization: 9614aa1a-0c41-4883-8b76-d20369b3dc78' \
+    -H 'X-CSRF-TOKEN: 19YEfX5dpdx_ySFBjfzjgpT7MXyfZhoX5rEWzesc2GigkYiCsec0Shtkx7pS8EB1vdHX4PHLHB2nXyk60IV1q9kk7AzG9O7n' \
     -d '{
   "link" : "https://abcdefssss/2in2",
   "title" : "RESTful API",
@@ -1077,9 +1077,9 @@ code=614df104-03f2-4a1d-8f3b-f71c10c975f8</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/v1/posts HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: 61081c44-24b5-4aa9-b6ad-dca1e0a06a2b
+Authorization: 9614aa1a-0c41-4883-8b76-d20369b3dc78
 Content-Length: 131
-X-CSRF-TOKEN: 4zW8gbPNwOG7Oluyk0Td_6iIlXDeGi3v_exI7BDZWOlT3eAl1FeJuYKs8tWWC2jRoGnpmpy5uEnoK0vCzdQtjna4b49i6IMd
+X-CSRF-TOKEN: 19YEfX5dpdx_ySFBjfzjgpT7MXyfZhoX5rEWzesc2GigkYiCsec0Shtkx7pS8EB1vdHX4PHLHB2nXyk60IV1q9kk7AzG9O7n
 Host: localhost:8080
 
 {
@@ -1215,7 +1215,7 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/api/v1/posts/1' -i -X GET \
-    -H 'Authorization: d9e78ef8-6d85-4674-acb8-28eaa13bef10'</code></pre>
+    -H 'Authorization: 8d9fb8f1-acd3-460e-8c5a-8cfa36aae363'</code></pre>
 </div>
 </div>
 </div>
@@ -1224,7 +1224,7 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/v1/posts/1 HTTP/1.1
-Authorization: d9e78ef8-6d85-4674-acb8-28eaa13bef10
+Authorization: 8d9fb8f1-acd3-460e-8c5a-8cfa36aae363
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1248,7 +1248,7 @@ Host: localhost:8080</code></pre>
   "title" : "RESTful API",
   "content" : "Restful API란.....",
   "link" : "https://abcdefssss/2in2",
-  "createdAt" : "2024-01-24T19:10:28.472304",
+  "createdAt" : "2024-01-24T19:11:26.631684",
   "commentCount" : 1,
   "categoryName" : "java"
 }</code></pre>
@@ -1325,8 +1325,8 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/api/v1/posts/1' -i -X PUT \
     -H 'Content-Type: application/json;charset=UTF-8' \
-    -H 'Authorization: 298bf214-883f-4aba-b4e7-3a8a4937a4b4' \
-    -H 'X-CSRF-TOKEN: -ROOnvBRcp1wfKg33unPqds9NuudCPYEcpZcMz4RxkrMj-iGynborZFpE_5dTc4F7sT7yO8FG4qrOZIpQa9lBAgho3__7dG1' \
+    -H 'Authorization: d9f2dbaf-51fd-4667-b140-eb7a89d4ffc6' \
+    -H 'X-CSRF-TOKEN: YPqUQcMN_p8DcXxqzpSLsBw_PYJgvEc_DxWkOlt6S-x5sk10A8mndfNsyqYuQkxYrbm_gX4MEOACjHUSbiXGDmsYLdROgXsQ' \
     -d '{
   "link" : "https://abcdefssss/2in2",
   "title" : "RESTful API",
@@ -1342,9 +1342,9 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PUT /api/v1/posts/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: 298bf214-883f-4aba-b4e7-3a8a4937a4b4
+Authorization: d9f2dbaf-51fd-4667-b140-eb7a89d4ffc6
 Content-Length: 133
-X-CSRF-TOKEN: -ROOnvBRcp1wfKg33unPqds9NuudCPYEcpZcMz4RxkrMj-iGynborZFpE_5dTc4F7sT7yO8FG4qrOZIpQa9lBAgho3__7dG1
+X-CSRF-TOKEN: YPqUQcMN_p8DcXxqzpSLsBw_PYJgvEc_DxWkOlt6S-x5sk10A8mndfNsyqYuQkxYrbm_gX4MEOACjHUSbiXGDmsYLdROgXsQ
 Host: localhost:8080
 
 {
@@ -1415,7 +1415,7 @@ Host: localhost:8080
   "content" : "Restful API란.....",
   "link" : "https://abcdefssss/2in2",
   "commentCount" : 1,
-  "createdAt" : "2024-01-24T19:10:28.452022",
+  "createdAt" : "2024-01-24T19:11:26.611017",
   "userId" : 1,
   "userEmail" : "test@gmail.com",
   "categoryName" : "spring",
@@ -1498,8 +1498,8 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/api/v1/posts/1' -i -X DELETE \
-    -H 'Authorization: bf7f0dc3-0398-44ab-b7fc-6fbfd9afc122' \
-    -H 'X-CSRF-TOKEN: nQX2QTAWeUSlpJ6VCbVW_uIz6ccIU_5usgaTglIlYoWMODFt-WOSIAB0T3WIxvygPJhinYQFxP4_MZxD1GPw5jZHVuC7C1dU'</code></pre>
+    -H 'Authorization: 9fd2e3ec-8909-43df-af7c-3d981a7541bb' \
+    -H 'X-CSRF-TOKEN: QsG2z5LwSPxkra4ic78xifn_hEAES1CLcUJU9qVhBcUKHqP0dvnT_KTJKs1JlctDFpIFvsuaqSE2KWWmQnQwkpxSZqBve5LH'</code></pre>
 </div>
 </div>
 </div>
@@ -1508,8 +1508,8 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /api/v1/posts/1 HTTP/1.1
-Authorization: bf7f0dc3-0398-44ab-b7fc-6fbfd9afc122
-X-CSRF-TOKEN: nQX2QTAWeUSlpJ6VCbVW_uIz6ccIU_5usgaTglIlYoWMODFt-WOSIAB0T3WIxvygPJhinYQFxP4_MZxD1GPw5jZHVuC7C1dU
+Authorization: 9fd2e3ec-8909-43df-af7c-3d981a7541bb
+X-CSRF-TOKEN: QsG2z5LwSPxkra4ic78xifn_hEAES1CLcUJU9qVhBcUKHqP0dvnT_KTJKs1JlctDFpIFvsuaqSE2KWWmQnQwkpxSZqBve5LH
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1539,8 +1539,8 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/api/v1/subscribe?pageNumber=5' -i -X GET \
-    -H 'Authorization: ca2b5966-e4a3-4b83-bd36-a33504579304' \
-    -H 'X-CSRF-TOKEN: 6dOC2bl4Dj6H3mHCMm9QNKo27g3NTiRGoVr7TdFpo09t51V52ePjvdtIPg6q7QD2BkJkUJ4Fw2-sK0JrlzzIeeANkn5Z1TYa'</code></pre>
+    -H 'Authorization: 1bfc5513-b9f6-4ea8-b6c5-cb9cf553a194' \
+    -H 'X-CSRF-TOKEN: 39csw2GgOW6D-TMsI6FsdKgLfY_IZ0GT6iqeXoUMxz0EILYiubIdoVGRDQiumgNPQIxYQJA9UO6tVnC-2xmnbOY08QowFdMW'</code></pre>
 </div>
 </div>
 </div>
@@ -1549,8 +1549,8 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/v1/subscribe?pageNumber=5 HTTP/1.1
-Authorization: ca2b5966-e4a3-4b83-bd36-a33504579304
-X-CSRF-TOKEN: 6dOC2bl4Dj6H3mHCMm9QNKo27g3NTiRGoVr7TdFpo09t51V52ePjvdtIPg6q7QD2BkJkUJ4Fw2-sK0JrlzzIeeANkn5Z1TYa
+Authorization: 1bfc5513-b9f6-4ea8-b6c5-cb9cf553a194
+X-CSRF-TOKEN: 39csw2GgOW6D-TMsI6FsdKgLfY_IZ0GT6iqeXoUMxz0EILYiubIdoVGRDQiumgNPQIxYQJA9UO6tVnC-2xmnbOY08QowFdMW
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1577,7 +1577,7 @@ Host: localhost:8080</code></pre>
     "commentCount" : 0,
     "userEmail" : "test@gmail.com",
     "userId" : 1,
-    "createdAt" : "2024-01-24T19:10:28.758174",
+    "createdAt" : "2024-01-24T19:11:26.924411",
     "subscribeMe" : true,
     "categoryName" : "java"
   }, {
@@ -1588,7 +1588,7 @@ Host: localhost:8080</code></pre>
     "commentCount" : 0,
     "userEmail" : "test@gmail.com",
     "userId" : 1,
-    "createdAt" : "2024-01-24T19:10:28.758200",
+    "createdAt" : "2024-01-24T19:11:26.924439",
     "subscribeMe" : true,
     "categoryName" : "java"
   } ]
@@ -1680,8 +1680,8 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/api/v1/subscribe/1' -i -X POST \
-    -H 'Authorization: 7a0cae87-92ea-4f7b-9dd0-472381235811' \
-    -H 'X-CSRF-TOKEN: zk43_L_lbXiZVRf7PnizceR81Hx2slYdqwWavYBU_CVTBCjH-3gEzNqADhy0MSGaB1WHE9IY-URCgG8wmTH-2LVtzBEwMU71'</code></pre>
+    -H 'Authorization: b9557367-f33e-42bc-99dc-40cea2e89a07' \
+    -H 'X-CSRF-TOKEN: N9yKS8OzTq9RFaIFAGWvU9CkxeX9_Xwgd-Mr6rreVAkFd1vYB-m-faWEfct8cJU9OUibMuXB6IfPnEkNRdtI3Y7qbDswRGm6'</code></pre>
 </div>
 </div>
 </div>
@@ -1690,8 +1690,8 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/v1/subscribe/1 HTTP/1.1
-Authorization: 7a0cae87-92ea-4f7b-9dd0-472381235811
-X-CSRF-TOKEN: zk43_L_lbXiZVRf7PnizceR81Hx2slYdqwWavYBU_CVTBCjH-3gEzNqADhy0MSGaB1WHE9IY-URCgG8wmTH-2LVtzBEwMU71
+Authorization: b9557367-f33e-42bc-99dc-40cea2e89a07
+X-CSRF-TOKEN: N9yKS8OzTq9RFaIFAGWvU9CkxeX9_Xwgd-Mr6rreVAkFd1vYB-m-faWEfct8cJU9OUibMuXB6IfPnEkNRdtI3Y7qbDswRGm6
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -1744,8 +1744,8 @@ Content-Type: application/x-www-form-urlencoded</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/api/v1/subscribe/1' -i -X DELETE \
-    -H 'Authorization: 9f11b27f-0732-4f5a-bdf5-1e1d0d58304e' \
-    -H 'X-CSRF-TOKEN: Barb7vemCHxwOB0lFzC3NTAFxKl15anMg7nSko6dgr1ARzwBMJvsi5afMRldWyhHJx2DBABg6csQ1Mvhtovjprz74dwmJghj'</code></pre>
+    -H 'Authorization: e949f0a5-75b9-411b-9e33-34781cd571ca' \
+    -H 'X-CSRF-TOKEN: 8CYzVVkoRlJYlHT_oOXFqNWwKUAIAk6A0Fvru28yxgyQxh4HwBRQbT9JImp1pkPPwcjxzbOCBCI9MS2t52rTjQ5R9Til8CZj'</code></pre>
 </div>
 </div>
 </div>
@@ -1754,8 +1754,8 @@ Content-Type: application/x-www-form-urlencoded</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /api/v1/subscribe/1 HTTP/1.1
-Authorization: 9f11b27f-0732-4f5a-bdf5-1e1d0d58304e
-X-CSRF-TOKEN: Barb7vemCHxwOB0lFzC3NTAFxKl15anMg7nSko6dgr1ARzwBMJvsi5afMRldWyhHJx2DBABg6csQ1Mvhtovjprz74dwmJghj
+Authorization: e949f0a5-75b9-411b-9e33-34781cd571ca
+X-CSRF-TOKEN: 8CYzVVkoRlJYlHT_oOXFqNWwKUAIAk6A0Fvru28yxgyQxh4HwBRQbT9JImp1pkPPwcjxzbOCBCI9MS2t52rTjQ5R9Til8CZj
 Host: localhost:8080</code></pre>
 </div>
 </div>
