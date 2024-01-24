@@ -6,6 +6,7 @@ import com.douunderstandapi.common.exception.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -34,5 +35,10 @@ public class CustomExceptionAdvice {
                 )
         );
         return ErrorResponse.toResponseEntity(ErrorCode.REDIS_CONNECTION_DOWN);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    protected ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
+        return ErrorResponse.toResponseEntity(ex.getBindingResult());
     }
 }
