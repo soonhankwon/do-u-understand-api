@@ -2,6 +2,7 @@ package com.douunderstandapi.common.utils.mail;
 
 import com.douunderstandapi.common.utils.mail.dto.AuthEmailDTO;
 import com.douunderstandapi.common.utils.mail.dto.NotificationEmailDTO;
+import com.douunderstandapi.common.utils.mail.dto.PasswordRefreshEmailDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -40,6 +41,17 @@ public class EmailUtils {
         }
     }
 
+    public String sendPasswordRefreshMessage(String targetEmail, String password) {
+        try {
+            PasswordRefreshEmailDTO dto = PasswordRefreshEmailDTO.from(password);
+            MimeMessage message = createMessage(targetEmail, dto);
+            javaMailSender.send(message);
+            return dto.code();
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            throw new RuntimeException();
+        }
+    }
+
     public String sendPostNotificationMessage(String targetEmail, NotificationEmailDTO dto) {
         try {
             MimeMessage message = createMessage(targetEmail, dto);
@@ -56,14 +68,21 @@ public class EmailUtils {
         // targetEmail 보내는 대상
         message.addRecipients(MimeMessage.RecipientType.TO, targetEmail);
         String msg = null;
+
+        assert t != null;
         if (t instanceof AuthEmailDTO dto) {
             message.setSubject(DOMAIN_NAME + " " + dto.title()); //메일 제목
-            // 메일 내용 만들기 html text
+            // 인증 메일 내용 만들기 html text
             msg = createAuthEmailMessage(dto.code());
+        }
+        if (t instanceof PasswordRefreshEmailDTO dto) {
+            message.setSubject(DOMAIN_NAME + " " + dto.title()); //메일 제목
+            // 임시 비밀번호 발급 메일 내용 만들기 html text
+            msg = createPasswordRefreshEmailMessage(dto.code());
         }
         if (t instanceof NotificationEmailDTO dto) {
             message.setSubject(DOMAIN_NAME + " " + dto.title()); //메일 제목
-            // 메일 내용 만들기 html text
+            // 노티 메일 내용 만들기 html text
             msg = createNotificationMailMessage(dto);
         }
 
@@ -79,6 +98,15 @@ public class EmailUtils {
                 + "<div style=\"background-color: #F4F4F4; padding: 30px; border-radius: 10px;\">"
                 + "<h1 style=\"font-size: 24px; color: #333;\">[회원가입 인증 코드]%s</h1>"
                 + "<p style=\"font-size: 16px; color: #666;\">아래 인증번호를 확인 후 복사해서 입력해주세요.</p>"
+                + "%s"
+                + "</td></tr></tbody></table></div></body></html>", DOMAIN_NAME, code);
+    }
+
+    private String createPasswordRefreshEmailMessage(String code) {
+        return String.format("<html><body style=\"font-family: 'Arial', sans-serif;\">"
+                + "<div style=\"background-color: #F4F4F4; padding: 30px; border-radius: 10px;\">"
+                + "<h1 style=\"font-size: 24px; color: #333;\">[임시 비밀번호]%s</h1>"
+                + "<p style=\"font-size: 16px; color: #666;\">아래 임시 비밀번호를 확인 후 로그인해주세요. 로그인 후 비밀번호를 재설정해주세요.</p>"
                 + "%s"
                 + "</td></tr></tbody></table></div></body></html>", DOMAIN_NAME, code);
     }

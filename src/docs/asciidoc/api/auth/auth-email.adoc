@@ -2,18 +2,18 @@
 
 ==== 1. Curl Request
 
-include::{snippets}/auth-user-email/curl-request.adoc[]
+include::{snippets}/auth-email/curl-request.adoc[]
 
 ==== 2. HTTP Request
 
-include::{snippets}/auth-user-email/http-request.adoc[]
+include::{snippets}/auth-email/http-request.adoc[]
 
 ==== 3. HTTP Request Body
 
-include::{snippets}/auth-user-email/request-body.adoc[]
-include::{snippets}/auth-user-email/request-fields.adoc[]
+include::{snippets}/auth-email/request-body.adoc[]
+include::{snippets}/auth-email/request-fields.adoc[]
 
 ==== 4. HTTP Response Body
 
-include::{snippets}/auth-user-email/response-body.adoc[]
-include::{snippets}/auth-user-email/response-fields.adoc[]
+include::{snippets}/auth-email/response-body.adoc[]
+include::{snippets}/auth-email/response-fields.adoc[]

@@ -35,7 +35,7 @@ jobs:
             ${{ runner.os }}-gradle-   
 
       # main 설정 파일 생성 및 write
-      - name: Set application.properties for main
+      - name: Set application.yml for main
         run: |
           # main 설정 파일 디렉토리로 이동
           cd ./src/main/resources

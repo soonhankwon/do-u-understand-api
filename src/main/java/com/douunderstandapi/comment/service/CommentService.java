@@ -45,7 +45,10 @@ public class CommentService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
-        Post post = postRepository.findById(commentAddRequest.postId())
+        Long postId = commentAddRequest.postId();
+        assert postId != null;
+        
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_POST_ID));
 
         Comment comment = commentAddRequest.toEntity(commentAddRequest, user, post);
@@ -59,8 +62,13 @@ public class CommentService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
-        Comment comment = commentRepository.findByIdAndUser(request.commentId(), user)
-                .orElseThrow(() -> new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_ACCESS));
+        Long commentId = request.commentId();
+        assert commentId != null;
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_COMMENT_ID));
+
+        comment.validateDeleteAuth(user);
 
         commentRepository.delete(comment);
         return CommentDeleteResponse.from(comment);

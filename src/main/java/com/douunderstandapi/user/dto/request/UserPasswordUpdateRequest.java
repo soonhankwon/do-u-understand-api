@@ -11,9 +11,6 @@ public record UserPasswordUpdateRequest(
                 regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[@#$%^&+=!]).*$",
                 message = "패스워드는 숫자, 문자, 특수 문자를 포함해야 합니다."
         )
-        String password,
-
-        @NotBlank(message = "인증코드는 null 또는 공백문자를 허용하지 않습니다.")
-        String authCode
+        String password
 ) {
 }

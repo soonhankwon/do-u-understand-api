@@ -74,23 +74,13 @@ public class UserService {
 
     @Transactional
     public UserPasswordUpdateResponse updatePassword(String email, UserPasswordUpdateRequest request) {
-        String code = authEmailCodeRepository
-                .get(email)
-                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_AUTH_CODE));
-
-        String inputCode = request.authCode();
-        assert inputCode != null;
-        if (isInputCodeEqualAuthCode(inputCode, code)) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_AUTH_CODE);
-        }
-
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
         String password = request.password();
         assert password != null;
+
         user.updatePassword(password, passwordEncoder::encode);
-        authEmailCodeRepository.delete(email);
         return UserPasswordUpdateResponse.from(user);
     }
 }

@@ -1,5 +1,7 @@
 package com.douunderstandapi.comment.domain;
 
+import com.douunderstandapi.common.enumtype.ErrorCode;
+import com.douunderstandapi.common.exception.CustomException;
 import com.douunderstandapi.post.domain.Post;
 import com.douunderstandapi.user.domain.User;
 import jakarta.persistence.Entity;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @Entity
@@ -41,5 +44,11 @@ public class Comment {
         this.createdAt = LocalDateTime.now();
         this.user = user;
         this.post = post;
+    }
+
+    public void validateDeleteAuth(User user) {
+        if (this.user != user) {
+            throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_ACCESS);
+        }
     }
 }

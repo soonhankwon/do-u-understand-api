@@ -36,3 +36,8 @@ out/
 ### VS Code ###
 .vscode/
 /src/main/resources/application.yml
+/src/main/resources/static/docs/index.html
+/src/main/resources/static/docs/api/auth/*.html
+/src/main/resources/static/docs/api/post/*.html
+/src/main/resources/static/docs/api/subscribe/*.html
+/src/main/resources/static/docs/api/user/*.html
