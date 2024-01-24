@@ -3,13 +3,21 @@ package com.douunderstandapi.post.dto.request;
 import com.douunderstandapi.category.domain.Category;
 import com.douunderstandapi.post.domain.Post;
 import com.douunderstandapi.user.domain.User;
-import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record PostAddRequest(
+        @NotBlank(message = "제목은 null 또는 공백문자를 허용하지 않습니다.")
         String title,
+
+        @NotBlank(message = "컨텐츠는 null 또는 공백문자를 허용하지 않습니다.")
         String content,
+
+        @NotNull(message = "링크는 null을 허용하지 않습니다.")
         String link,
-        List<String> categoryNames
+
+        @NotBlank(message = "카테고리는 null 또는 공백문자를 허용하지 않습니다.")
+        String categoryName
 ) {
     public Post toEntity(User user, Category category) {
         return Post.of(
