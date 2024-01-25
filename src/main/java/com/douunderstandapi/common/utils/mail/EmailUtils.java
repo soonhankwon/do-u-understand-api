@@ -23,7 +23,7 @@ public class EmailUtils {
     @Value("${spring.mail.username}")
     private String username;
 
-    private static final String DOMAIN_NAME = "DO-U-UNDERSTAND";
+    private static final String DOMAIN_NAME = "SELFnews";
     private static final String MORNING = "Morning";
     private static final String AFTERNOON = "Afternoon";
     private static final String EVENING = "Evening";
