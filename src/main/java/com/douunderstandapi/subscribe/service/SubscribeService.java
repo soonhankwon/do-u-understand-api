@@ -41,8 +41,9 @@ public class SubscribeService {
         Page<Subscribe> page = subscribeRepository.findAllByUser(user, pageable);
 
         List<PostDTO> postDTOS;
+        List<Subscribe> subscribes = page.getContent();
         if (query != null && !query.isEmpty()) {
-            postDTOS = page.getContent()
+            postDTOS = subscribes
                     .stream()
                     .map(Subscribe::getPost)
                     .filter(p -> p.getCategory().getName().equals(query))
@@ -53,7 +54,7 @@ public class SubscribeService {
                     })
                     .collect(Collectors.toList());
         } else {
-            postDTOS = page.getContent()
+            postDTOS = subscribes
                     .stream()
                     .map(Subscribe::getPost)
                     .map(p -> {
@@ -65,7 +66,7 @@ public class SubscribeService {
         }
 
         int totalPages = page.getTotalPages();
-        return new SubscribePostsGetResponse(totalPages, postDTOS);
+        return SubscribePostsGetResponse.of(totalPages, postDTOS);
     }
 
     @Transactional

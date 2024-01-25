@@ -7,4 +7,7 @@ public record SubscribePostsGetResponse(
         int totalPageCount,
         List<PostDTO> postList
 ) {
+    public static SubscribePostsGetResponse of(int totalPages, List<PostDTO> postDTOS) {
+        return new SubscribePostsGetResponse(totalPages, postDTOS);
+    }
 }
