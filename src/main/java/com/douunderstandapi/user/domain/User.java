@@ -13,6 +13,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -24,7 +25,10 @@ import org.springframework.http.HttpStatus;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "`user`")
+@Table(name = "`user`", indexes = {
+        @Index(name = "user_email_idx", columnList = "email"),
+        @Index(name = "user_allowed_notification_idx", columnList = "allowed_notification")
+})
 public class User extends UserBaseTimeEntity {
 
     @Id
