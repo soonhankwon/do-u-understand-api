@@ -49,7 +49,7 @@ class SubscribeControllerTest {
     @MockBean
     private SubscribeService subscribeService;
 
-    @DisplayName("{GET} 구독 포스트 조회 - 정상호출")
+    @DisplayName("{GET} 구독 포스트 조회[RequestParam: query]- 정상호출")
     @WithUserPrincipals
     @Test
     void getSubscribePosts() throws Exception {
@@ -59,6 +59,7 @@ class SubscribeControllerTest {
         mvc.perform(
                         RestDocumentationRequestBuilders.get("/api/v1/subscribe")
                                 .param("pageNumber", "5")
+                                .param("query", "jpa")
                                 .with(csrf().asHeader())
                                 .header(HttpHeaders.AUTHORIZATION, UUID.randomUUID().toString()))
                 .andDo(print())
