@@ -117,7 +117,7 @@ public class EmailUtils {
         String msg = "<html><body style=\"font-family: 'Arial', sans-serif;\">";
         msg += "<div style=\"background-color: #F4F4F4; padding: 30px; border-radius: 10px;\">";
         msg += "<h1 style=\"font-size: 24px; color: #333;\">" + "[" + timeTextNow + "]" + dto.title() + "</h1>";
-        msg += "<p style=\"font-size: 16px; color: #666;\">" + dto.content() + "</p>";
+        msg += "<p class=\"whitespace-pre-line\" style=\"font-size: 16px; color: #666;\">" + dto.content() + "</p>";
         msg += "<p style=\"font-size: 16px; color: #666;\">아래 관련 링크에서 컨텐츠를 확인해보세요.</p>";
         msg += "<div style=\"margin-top: 20px;\"><a href=\"" + dto.link()
                 + "\" style=\"display: inline-block; padding: 12px 24px; background-color: #007BFF; color: #fff; text-decoration: none; border-radius: 5px;\">컨텐츠 확인하기</a></div>";
