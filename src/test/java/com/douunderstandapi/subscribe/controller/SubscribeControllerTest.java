@@ -53,7 +53,7 @@ class SubscribeControllerTest {
     @WithUserPrincipals
     @Test
     void getSubscribePosts() throws Exception {
-        when(subscribeService.getSubscribePosts(anyString(), anyInt()))
+        when(subscribeService.getSubscribePosts(anyString(), anyInt(), anyString()))
                 .thenReturn(createSubscribePostsGetResponse());
 
         mvc.perform(

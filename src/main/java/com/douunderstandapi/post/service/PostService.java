@@ -32,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
-@Transactional
 public class PostService {
 
     private final PostRepository postRepository;
@@ -41,6 +40,9 @@ public class PostService {
     private final CategoryRepository categoryRepository;
     private final CommentRepository commentRepository;
 
+    private static final String NOTICE_PARAM = "all";
+
+    @Transactional
     public PostAddResponse addPost(String email, PostAddRequest request) {
         User user = userRepository
                 .findByEmail(email)
@@ -80,6 +82,7 @@ public class PostService {
         return PostGetResponse.of(post, count);
     }
 
+    @Transactional
     public PostUpdateResponse update(String email, Long postId, PostUpdateRequest request) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
@@ -109,6 +112,7 @@ public class PostService {
         return PostUpdateResponse.of(post, category, false);
     }
 
+    @Transactional
     public Boolean delete(String email, Long postId) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
@@ -125,23 +129,30 @@ public class PostService {
         return Boolean.TRUE;
     }
 
-    public PostsGetResponse findPosts(String email, int pageNumber, String mode) {
+    public PostsGetResponse findPosts(String email, int pageNumber, String mode, String query) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
         Pageable pageable = PageRequest.of(pageNumber, 10);
         Page<Post> page;
-        if (mode.equals("all")) {
+        if (mode.equals(NOTICE_PARAM)) {
             page = postRepository.findAllByPostStatus(PostStatus.NOTICE, pageable);
         } else {
             page = postRepository.findAllByUser(user, pageable);
         }
 
         int totalPages = page.getTotalPages();
-        List<Post> posts = page.getContent();
-
-        List<PostDTO> postDTO = getPostDTO(posts, user);
-        return new PostsGetResponse(totalPages, postDTO);
+        List<Post> postsByPaging = page.getContent();
+        List<PostDTO> postDTO;
+        if (query != null && !query.isEmpty()) {
+            List<Post> postsByFiltered = postsByPaging.stream()
+                    .filter(p -> p.getCategory().getName().equals(query))
+                    .collect(Collectors.toList());
+            postDTO = getPostDTO(postsByFiltered, user);
+            return PostGetResponse.of(totalPages, postDTO);
+        }
+        postDTO = getPostDTO(postsByPaging, user);
+        return PostGetResponse.of(totalPages, postDTO);
     }
 
     private List<PostDTO> getPostDTO(List<Post> posts, User user) {

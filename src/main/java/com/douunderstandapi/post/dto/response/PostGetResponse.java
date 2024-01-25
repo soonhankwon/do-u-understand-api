@@ -1,6 +1,8 @@
 package com.douunderstandapi.post.dto.response;
 
 import com.douunderstandapi.post.domain.Post;
+import com.douunderstandapi.post.dto.PostDTO;
+import java.util.List;
 import lombok.Builder;
 
 @Builder
@@ -27,5 +29,9 @@ public record PostGetResponse(
                 commentCount,
                 post.getCategory().getName()
         );
+    }
+
+    public static PostsGetResponse of(int totalPages, List<PostDTO> postDTO) {
+        return new PostsGetResponse(totalPages, postDTO);
     }
 }

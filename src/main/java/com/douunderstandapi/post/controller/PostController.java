@@ -44,10 +44,11 @@ public class PostController {
     public ResponseEntity<PostsGetResponse> getPosts(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam int pageNumber,
-            @RequestParam(required = false) String mode) {
+            @RequestParam(required = false) String mode,
+            @RequestParam(required = false) String query) {
 
         String email = getEmailFromUserDetails(userDetails);
-        PostsGetResponse response = postService.findPosts(email, pageNumber, mode);
+        PostsGetResponse response = postService.findPosts(email, pageNumber, mode, query);
         return ResponseEntity.ok().body(response);
     }
 

@@ -33,22 +33,36 @@ public class SubscribeService {
     private final SubscribeRepository subscribeRepository;
     private final CommentRepository commentRepository;
 
-    public SubscribePostsGetResponse getSubscribePosts(String email, int pageNumber) {
+    public SubscribePostsGetResponse getSubscribePosts(String email, int pageNumber, String query) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
         Pageable pageable = PageRequest.of(pageNumber, 10);
         Page<Subscribe> page = subscribeRepository.findAllByUser(user, pageable);
 
-        List<PostDTO> postDTOS = page.getContent()
-                .stream()
-                .map(Subscribe::getPost)
-                .map(p -> {
-                    Long commentCount = commentRepository.countAllByPost(p);
-                    assert commentCount != null;
-                    return PostDTO.of(p, commentCount, true);
-                })
-                .collect(Collectors.toList());
+        List<PostDTO> postDTOS;
+        if (query != null && !query.isEmpty()) {
+            postDTOS = page.getContent()
+                    .stream()
+                    .map(Subscribe::getPost)
+                    .filter(p -> p.getCategory().getName().equals(query))
+                    .map(p -> {
+                        Long commentCount = commentRepository.countAllByPost(p);
+                        assert commentCount != null;
+                        return PostDTO.of(p, commentCount, true);
+                    })
+                    .collect(Collectors.toList());
+        } else {
+            postDTOS = page.getContent()
+                    .stream()
+                    .map(Subscribe::getPost)
+                    .map(p -> {
+                        Long commentCount = commentRepository.countAllByPost(p);
+                        assert commentCount != null;
+                        return PostDTO.of(p, commentCount, true);
+                    })
+                    .collect(Collectors.toList());
+        }
 
         int totalPages = page.getTotalPages();
         return new SubscribePostsGetResponse(totalPages, postDTOS);
