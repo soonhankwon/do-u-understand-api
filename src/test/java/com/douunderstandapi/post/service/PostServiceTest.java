@@ -46,7 +46,7 @@ class PostServiceTest {
         when(categoryRepository.findByName(any(String.class)))
                 .thenReturn(Optional.of(createCategory(categoryName)));
         when(postRepository.save(any(Post.class)))
-                .thenReturn(createKnowledge());
+                .thenReturn(createPost());
         when(userRepository.findByEmail(any(String.class)))
                 .thenReturn(Optional.of(createUser()));
 
@@ -84,7 +84,7 @@ class PostServiceTest {
     @DisplayName("포스트 상세조회(단건) - 자신의 지식이 아닌것을 조회하는 경우 Exception")
     void findPost_not_my_post() {
         String email = "test@gmail.com";
-        when(postRepository.findById(any(Long.class))).thenReturn(Optional.of(createKnowledge()));
+        when(postRepository.findById(any(Long.class))).thenReturn(Optional.of(createPost()));
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(createUser()));
 
         assertThatThrownBy(() -> postService.findPost(email, 1L))
@@ -95,7 +95,7 @@ class PostServiceTest {
     @DisplayName("포스트 업데이트 - 자신의 지식이 아닌것을 업데이트하는 경우 Exception")
     void updatePost() {
         String email = "test@gmail.com";
-        when(postRepository.findById(any(Long.class))).thenReturn(Optional.of(createKnowledge()));
+        when(postRepository.findById(any(Long.class))).thenReturn(Optional.of(createPost()));
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(createUser()));
 
         PostUpdateRequest request = new PostUpdateRequest("RESTful API 수정본", "수정된 버전의 내용",
@@ -109,7 +109,7 @@ class PostServiceTest {
     @DisplayName("포스트 삭제 - 자신의 지식이 아닌것을 삭제하는 경우 Exception")
     void deletePost() {
         String email = "test@gmail.com";
-        when(postRepository.findById(any(Long.class))).thenReturn(Optional.of(createKnowledge()));
+        when(postRepository.findById(any(Long.class))).thenReturn(Optional.of(createPost()));
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(createUser()));
 
         assertThatThrownBy(() -> postService.delete(email, 1L))
@@ -120,7 +120,7 @@ class PostServiceTest {
         return new PostAddRequest(title, content, link, categoryName);
     }
 
-    private Post createKnowledge() {
+    private Post createPost() {
         return Post.of("함수 네이밍 룰 컨벤션",
                 "GET 요청을 처리하는 메서드의 네이밍 규칭......",
                 "https://sdnksnd/sds123", createUser(),

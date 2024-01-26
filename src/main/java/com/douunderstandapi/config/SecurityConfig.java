@@ -3,7 +3,6 @@ package com.douunderstandapi.config;
 import com.douunderstandapi.auth.service.AuthService;
 import com.douunderstandapi.common.security.filter.JwtVerificationFilter;
 import com.douunderstandapi.common.security.handler.CustomAuthenticationEntryPoint;
-import com.douunderstandapi.common.security.handler.CustomLogoutSuccessHandler;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPointHandler;
-    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
     private final AuthService authService;
 
     private static final String[] AUTH_WHITELIST = {
@@ -54,10 +52,6 @@ public class SecurityConfig {
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .logout(logout -> logout
-                        .logoutSuccessHandler(customLogoutSuccessHandler)
-                        .logoutUrl("/api/v1/logout")
-                )
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(
