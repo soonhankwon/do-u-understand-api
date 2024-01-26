@@ -9,7 +9,7 @@ public record UserPasswordUpdateRequest(
         @Size(min = 8, message = "패스워드는 최소 8글자 이상이어야 합니다.")
         @Pattern(
                 regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[@#$%^&+=!]).*$",
-                message = "패스워드는 숫자, 문자, 특수 문자를 포함해야 합니다."
+                message = "패스워드는 숫자, 문자, 특수 문자(@#$%^&+=!)를 포함해야 합니다."
         )
         String password
 ) {

@@ -19,8 +19,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.douunderstandapi.annotation.WithUserPrincipals;
 import com.douunderstandapi.user.dto.request.UserAddRequest;
+import com.douunderstandapi.user.dto.request.UserPasswordUpdateRequest;
 import com.douunderstandapi.user.dto.response.UserAddResponse;
 import com.douunderstandapi.user.dto.response.UserDeleteResponse;
+import com.douunderstandapi.user.dto.response.UserPasswordUpdateResponse;
 import com.douunderstandapi.user.enumType.UserStatus;
 import com.douunderstandapi.user.service.UserService;
 import java.util.UUID;
@@ -82,6 +84,52 @@ class UserControllerTest {
                 .andExpect(status().isCreated());
     }
 
+    @DisplayName("{PUT} 유저 패스워드 수정 요청 - 정상호출")
+    @WithUserPrincipals
+    @Test
+    void updatePassword() throws Exception {
+        JSONObject request = new JSONObject();
+        request.put("password", "password1!");
+
+        when(userService.updatePassword(anyString(), any(UserPasswordUpdateRequest.class)))
+                .thenReturn(createUserPasswordUpdateResponse());
+
+        mvc.perform(
+                        RestDocumentationRequestBuilders.put("/api/v1/users/update")
+                                .with(csrf().asHeader())
+                                .header(HttpHeaders.AUTHORIZATION, UUID.randomUUID().toString())
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(request.toString()))
+                .andDo(print())
+                .andDo(
+                        document(
+                                "update-user-password",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestFields(
+                                        fieldWithPath("password")
+                                                .type(STRING)
+                                                .description("패스워드")),
+                                responseFields(
+                                        fieldWithPath("id")
+                                                .type(NUMBER)
+                                                .description("회원 ID"),
+                                        fieldWithPath("email")
+                                                .type(STRING)
+                                                .description("이메일"),
+                                        fieldWithPath("isAllowedNotification")
+                                                .type(BOOLEAN)
+                                                .description("알람설정여부")
+                                )
+                        )
+                )
+                .andExpect(status().isOk());
+    }
+
+    public UserPasswordUpdateResponse createUserPasswordUpdateResponse() {
+        return UserPasswordUpdateResponse.of(1L, "selfnews@gmail.ocm", true);
+    }
+
     @DisplayName("{PATCH} 유저 탈퇴 요청 - 정상호출")
     @WithUserPrincipals
     @Test
@@ -109,7 +157,7 @@ class UserControllerTest {
                                                 .description("이메일"),
                                         fieldWithPath("userStatus")
                                                 .type(STRING)
-                                                .description("DELETED")
+                                                .description("유저상태")
                                 )
                         )
                 )
@@ -117,10 +165,10 @@ class UserControllerTest {
     }
 
     private UserAddResponse createUserAddResponse() {
-        return UserAddResponse.of(1L, "test@gmail.com", true);
+        return UserAddResponse.of(1L, "selfnews@gmail.com", true);
     }
 
     private UserDeleteResponse createUserDeleteResponse() {
-        return UserDeleteResponse.of(1L, "test@email.com", UserStatus.DELETED);
+        return UserDeleteResponse.of(1L, "selfnews@email.com", UserStatus.DELETED);
     }
 }

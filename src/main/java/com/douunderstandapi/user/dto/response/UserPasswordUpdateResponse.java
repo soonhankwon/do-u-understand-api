@@ -7,6 +7,11 @@ public record UserPasswordUpdateResponse(
         String email,
         Boolean isAllowedNotification
 ) {
+
+    public static UserPasswordUpdateResponse of(Long id, String email, Boolean isAllowedNotification) {
+        return new UserPasswordUpdateResponse(id, email, isAllowedNotification);
+    }
+
     public static UserPasswordUpdateResponse from(User user) {
         return new UserPasswordUpdateResponse(
                 user.getId(),
