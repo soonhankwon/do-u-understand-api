@@ -29,8 +29,10 @@ public class CommentController {
 
 
     @GetMapping("/{postId}")
-    public ResponseEntity<CommentsGetResponse> getComments(@PathVariable Long postId) {
-        CommentsGetResponse res = commentService.getComments(postId);
+    public ResponseEntity<CommentsGetResponse> getComments(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                           @PathVariable Long postId) {
+        String email = getEmailFromUserDetails(userDetails);
+        CommentsGetResponse res = commentService.getComments(email, postId);
         return ResponseEntity.ok().body(res);
     }
 

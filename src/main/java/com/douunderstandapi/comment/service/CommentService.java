@@ -28,9 +28,16 @@ public class CommentService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    public CommentsGetResponse getComments(Long postId) {
+    public CommentsGetResponse getComments(String email, Long postId) {
+        assert email != null;
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
+
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_POST_ID));
+        
+        post.validateAccessAuth(user);
 
         List<CommentDTO> commentDTOs = commentRepository.findAllByPost(post)
                 .stream()
@@ -47,7 +54,7 @@ public class CommentService {
 
         Long postId = commentAddRequest.postId();
         assert postId != null;
-        
+
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_POST_ID));
 
