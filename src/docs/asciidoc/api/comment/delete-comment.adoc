@@ -1,0 +1,17 @@
+=== 코멘트 삭제 API
+
+==== 1. Curl Request
+
+include::{snippets}/delete-comment/curl-request.adoc[]
+
+==== 2. HTTP Request
+
+include::{snippets}/delete-comment/http-request.adoc[]
+
+==== 3. HTTP Request Body
+
+include::{snippets}/delete-comment/request-body.adoc[]
+
+==== 4. HTTP Response Body
+
+include::{snippets}/delete-comment/response-body.adoc[]

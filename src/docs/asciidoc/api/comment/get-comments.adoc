@@ -1,0 +1,18 @@
+=== 코멘트 목록조회 API
+
+==== 1. Curl Request
+
+include::{snippets}/get-comments/curl-request.adoc[]
+
+==== 2. HTTP Request
+
+include::{snippets}/get-comments/http-request.adoc[]
+
+==== 3. HTTP Request Body
+
+include::{snippets}/get-comments/request-body.adoc[]
+
+==== 4. HTTP Response Body
+
+include::{snippets}/get-comments/response-body.adoc[]
+include::{snippets}/get-comments/response-fields.adoc[]

@@ -11,8 +11,6 @@ endif::[]
 
 = Common
 
-== 커스텀 에러
-
 == 인증 관련 API
 
 include::api/auth/auth-login.adoc[]
@@ -33,6 +31,12 @@ include::api/post/delete-post.adoc[]
 
 == 포스트 구독 관련 API
 
-include::api/subscribe/get-subscribe-posts.adoc[]
 include::api/subscribe/add-subscribe.adoc[]
+include::api/subscribe/get-subscribe-posts.adoc[]
 include::api/subscribe/cancel-subscribe.adoc[]
+
+== 코멘트 관련 API
+
+include::api/comment/add-comment.adoc[]
+include::api/comment/get-comments.adoc[]
+include::api/comment/delete-comment.adoc[]

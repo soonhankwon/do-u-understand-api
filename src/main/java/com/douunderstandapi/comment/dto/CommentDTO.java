@@ -1,7 +1,9 @@
 package com.douunderstandapi.comment.dto;
 
 import com.douunderstandapi.comment.domain.Comment;
+import lombok.Builder;
 
+@Builder
 public record CommentDTO(
         Long id,
         Long postId,

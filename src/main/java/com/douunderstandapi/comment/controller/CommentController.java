@@ -8,6 +8,7 @@ import com.douunderstandapi.comment.dto.response.CommentsGetResponse;
 import com.douunderstandapi.comment.service.CommentService;
 import com.douunderstandapi.common.security.impl.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -38,7 +39,7 @@ public class CommentController {
                                                          @Validated @RequestBody CommentAddRequest commentAddRequest) {
         String email = getEmailFromUserDetails(userDetails);
         CommentAddResponse res = commentService.addComment(email, commentAddRequest);
-        return ResponseEntity.ok().body(res);
+        return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
     @DeleteMapping
