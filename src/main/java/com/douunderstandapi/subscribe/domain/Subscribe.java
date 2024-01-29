@@ -2,6 +2,7 @@ package com.douunderstandapi.subscribe.domain;
 
 import com.douunderstandapi.post.domain.Post;
 import com.douunderstandapi.user.domain.User;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -37,6 +38,7 @@ public class Subscribe {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     public Subscribe(User user, Post post) {

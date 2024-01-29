@@ -27,7 +27,8 @@ import org.springframework.http.HttpStatus;
 @Entity
 @Table(name = "`post`", indexes = {
         @Index(name = "post_user_id_idx", columnList = "user_id"),
-        @Index(name = "post_post_status_idx", columnList = "post_status")
+        @Index(name = "post_post_status_idx", columnList = "post_status"),
+        @Index(name = "post_category_id_idx", columnList = "category_id")
 })
 public class Post {
 
@@ -59,6 +60,7 @@ public class Post {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     private Post(String title, String content, String link, User user, Category category) {
