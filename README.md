@@ -14,15 +14,14 @@
 - [아키텍처](#아키텍처)
 - [API 명세서](#api-명세서)
 - [ERD](#erd)
-- [프로젝트 진행 및 이슈관리](#프로젝트-진행-및-이슈관리)
 - [핵심문제 해결과정 및 전략](#핵심문제-해결과정-및-전략)
   <br/>
 
 ## 배포
 
 - Link: https://do-u-understand-web.vercel.app
-- Front-end UI는 Svelte.js로 구현했습니다.
-- Front-end Github Link: https://github.com/soonhankwon/self-news-web
+- Frontend UI는 Svelte.js로 구현했습니다.
+- Frontend Github Link: https://github.com/soonhankwon/self-news-web
 
 ## 기술스택
 
@@ -39,6 +38,7 @@
 - JJWT 0.12.3
 - JUnit5, Mockito
 - Jacoco 0.8.11
+- Apache Jmeter
 
 ### 데이터베이스
 
@@ -65,7 +65,5 @@
 ## ERD
 
 ![self-news-erd](https://github.com/soonhankwon/self-news-api/assets/113872320/d4bfa599-8115-468d-9cf4-5e43fa8281c9)
-
-## 프로젝트 진행 및 이슈관리
 
 ## 핵심문제 해결과정 및 전략
