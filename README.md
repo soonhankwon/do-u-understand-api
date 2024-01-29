@@ -56,11 +56,15 @@
 
 ## 아키텍처
 
+![self-news-arch drawio](https://github.com/soonhankwon/self-news-api/assets/113872320/368836bd-80eb-4894-be0a-6d9f72714e26)
+
 ## api 명세서
 
 - RestDocs: http://3.36.80.13/docs/api-document.html
 
 ## ERD
+
+![self-news-erd](https://github.com/soonhankwon/self-news-api/assets/113872320/d4bfa599-8115-468d-9cf4-5e43fa8281c9)
 
 ## 프로젝트 진행 및 이슈관리
 
