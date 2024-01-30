@@ -102,38 +102,38 @@
 <div markdown="1">       
 
 ````java
-public PostsGetResponse findPosts(String email, int pageNumber, String mode, String query)
+public PostsGetResponse findPosts(String email, int pageNumber, String mode, String query) {
 
-User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
-Pageable pageable = PageRequest.of(pageNumber, 10);
-Page<Post> page;
-              if(mode.
+    Pageable pageable = PageRequest.of(pageNumber, 10);
+    Page<Post> page;
+    if (mode.
 
-equals(NOTICE_PARAM)){
-page =postRepository.
+            equals(NOTICE_PARAM)) {
+        page = postRepository.
 
-findAllByPostStatus(PostStatus.NOTICE, pageable);
-              }else{
-// 이 조건 분기에서 유저의 포스트만 모두 찾아옴
-page =postRepository.
+                findAllByPostStatus(PostStatus.NOTICE, pageable);
+    } else {
+        // 이 조건 분기에서 유저의 포스트만 모두 찾아옴
+        page = postRepository.
 
-findAllByUser(user, pageable);
-              }
+                findAllByUser(user, pageable);
+    }
 
-int totalPages = page.getTotalPages();
-List<Post> postsByPage = page.getContent();
-List<PostDTO> postDTO;
-              .......
-// postDTO = getPostDTO(postsByPage, user);
-postDTO =
+    int totalPages = page.getTotalPages();
+    List<Post> postsByPage = page.getContent();
+    List<PostDTO> postDTO;
+    // logic .......
+    // postDTO = getPostDTO(postsByPage, user);
+    postDTO =
 
-getPostDTO(postsByPage);
-              return PostGetResponse.
+            getPostDTO(postsByPage);
+    return PostGetResponse.
 
-of(totalPages, postDTO);
-          }
+            of(totalPages, postDTO);
+}
 
 private List<PostDTO> getPostDTO(List<Post> posts) {
     return posts.stream()
@@ -196,7 +196,7 @@ private List<PostDTO> getPostDTO(List<Post> posts) {
 </details>
 
 - 2-1 리팩토링: 코멘트 카운트와 구독 포스트 리스트 조회를 Stream을 활용하여 Map으로 만들어준다.
-    - 일빙향 해쉬 테이블 알고리즘에서 아이디어를 가져옴
+    - 일방향 해쉬 테이블 알고리즘에서 아이디어를 가져옴
     - map 루프에서 코멘트 카운트와 구독 쿼리를 보내는 것보다. 한번에 맵을 만들어 놓고 맵을 조회 O(1)해서 로직을 돌리는것이 효율적일것이라고 판단
     - 하지만, 해당 경우 TPS의 유의미한 변화는 없었다.
 - 2-2 리팩토링: 맵을 만들어주는 로직을 parallelStream을 활용해 병렬처리
@@ -227,6 +227,9 @@ private List<PostDTO> getPostDTO(List<Post> posts) {
 }
 ````
 
+</div>
+</details>
+
 - Map & parallelStream 활용 리팩토링 성능 데이터
   <img width="882" alt="map-parallel-stream" src="https://github.com/soonhankwon/self-news-api/assets/113872320/29ca7cae-d961-4015-bae3-63f3896277eb">
     - TPS: 522.5/sec
@@ -235,7 +238,7 @@ private List<PostDTO> getPostDTO(List<Post> posts) {
     - Error: 0.00%
     - 개선율: (522.5 - 246.5 / 522.5) * 100 → 약 52.8%
 
-### 포스트 목록 조회 API 성능 개선 - 쿼리 파라미터(카테고리 검색)
+### 카테고리 포스트 목록 조회 API 성능 개선 - 쿼리 파라미터
 
 - 기존 모든 유저의 데이터를 가져와 stream filter를 활용하여 리턴하던 로직을 삭제하고 findAllByUserAndCategory_Name으로 직접 해당 데이터만 가져오도록 개선했습니다.
 
@@ -307,6 +310,9 @@ public PostsGetResponse findPosts(String email, int pageNumber, String mode, Str
     return PostGetResponse.of(totalPages, postDTO);
 }
 ````
+
+</div>
+</details>
 
 - 코드 리팩토링 및 쿼리 개선 전
   <img width="882" alt="query_param_init" src="https://github.com/soonhankwon/self-news-api/assets/113872320/19811fef-5c5a-44d6-83ce-13ec8f8ece65">
