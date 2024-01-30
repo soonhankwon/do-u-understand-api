@@ -311,6 +311,9 @@ public PostsGetResponse findPosts(String email, int pageNumber, String mode, Str
 }
 ````
 
+</div>
+</details>
+
 - 코드 리팩토링 및 쿼리 개선 전
   <img width="882" alt="query_param_init" src="https://github.com/soonhankwon/self-news-api/assets/113872320/19811fef-5c5a-44d6-83ce-13ec8f8ece65">
 
