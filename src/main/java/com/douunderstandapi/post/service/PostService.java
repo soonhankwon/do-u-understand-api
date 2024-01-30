@@ -20,6 +20,8 @@ import com.douunderstandapi.subscribe.repository.SubscribeRepository;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.repository.UserRepository;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -131,40 +133,37 @@ public class PostService {
 
     public PostsGetResponse findPosts(String email, int pageNumber, String mode, String query) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.NOT_EXIST_USER_EMAIL));
 
         Pageable pageable = PageRequest.of(pageNumber, 10);
         Page<Post> page;
         if (mode.equals(NOTICE_PARAM)) {
             page = postRepository.findAllByPostStatus(PostStatus.NOTICE, pageable);
+        } else if (query != null && !query.isEmpty()) {
+            page = postRepository.findAllByUserAndCategory_Name(user, query, pageable);
         } else {
             page = postRepository.findAllByUser(user, pageable);
         }
 
         int totalPages = page.getTotalPages();
-        List<Post> postsByPaging = page.getContent();
-        List<PostDTO> postDTO;
-        if (query != null && !query.isEmpty()) {
-            List<Post> postsByFiltered = postsByPaging.stream()
-                    .filter(p -> p.getCategory().getName().equals(query))
-                    .collect(Collectors.toList());
-            postDTO = getPostDTO(postsByFiltered, user);
-            return PostGetResponse.of(totalPages, postDTO);
-        }
-        postDTO = getPostDTO(postsByPaging, user);
+        List<Post> postsByPage = page.getContent();
+        List<PostDTO> postDTO = getPostDTO(postsByPage);
         return PostGetResponse.of(totalPages, postDTO);
     }
 
-    private List<PostDTO> getPostDTO(List<Post> posts, User user) {
+    private List<PostDTO> getPostDTO(List<Post> posts) {
+        Map<Post, Long> commentCounts = posts.parallelStream()
+                .collect(Collectors.toMap(post -> post, commentRepository::countAllByPost));
+        Map<Post, List<Subscribe>> subscribesByPost = posts.parallelStream()
+                .collect(Collectors.toMap(post -> post, subscribeRepository::findAllByPost));
+
         return posts.stream()
-                .map(p -> {
-                    Long commentCount = commentRepository.countAllByPost(p);
-                    Optional<Subscribe> optionalSubscribe = subscribeRepository.findByUserAndPost(user, p);
-                    if (optionalSubscribe.isPresent()) {
-                        return PostDTO.of(p, commentCount, true);
-                    } else {
-                        return PostDTO.of(p, commentCount, false);
-                    }
+                .map(post -> {
+                    Long commentCount = commentCounts.get(post);
+                    List<Subscribe> subscribes = subscribesByPost.get(post);
+                    boolean isSubscribed = subscribes.stream()
+                            .anyMatch(subscribe -> Objects.equals(subscribe.getPost().getId(), post.getId()));
+                    return PostDTO.of(post, commentCount, isSubscribed);
                 })
                 .collect(Collectors.toList());
     }
