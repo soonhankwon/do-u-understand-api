@@ -102,38 +102,38 @@
 <div markdown="1">       
 
 ````java
-public PostsGetResponse findPosts(String email, int pageNumber, String mode, String query)
+public PostsGetResponse findPosts(String email, int pageNumber, String mode, String query) {
 
-User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_USER_EMAIL));
 
-Pageable pageable = PageRequest.of(pageNumber, 10);
-Page<Post> page;
-              if(mode.
+    Pageable pageable = PageRequest.of(pageNumber, 10);
+    Page<Post> page;
+    if (mode.
 
-equals(NOTICE_PARAM)){
-page =postRepository.
+            equals(NOTICE_PARAM)) {
+        page = postRepository.
 
-findAllByPostStatus(PostStatus.NOTICE, pageable);
-              }else{
-// 이 조건 분기에서 유저의 포스트만 모두 찾아옴
-page =postRepository.
+                findAllByPostStatus(PostStatus.NOTICE, pageable);
+    } else {
+        // 이 조건 분기에서 유저의 포스트만 모두 찾아옴
+        page = postRepository.
 
-findAllByUser(user, pageable);
-              }
+                findAllByUser(user, pageable);
+    }
 
-int totalPages = page.getTotalPages();
-List<Post> postsByPage = page.getContent();
-List<PostDTO> postDTO;
-              .......
-// postDTO = getPostDTO(postsByPage, user);
-postDTO =
+    int totalPages = page.getTotalPages();
+    List<Post> postsByPage = page.getContent();
+    List<PostDTO> postDTO;
+    // logic .......
+    // postDTO = getPostDTO(postsByPage, user);
+    postDTO =
 
-getPostDTO(postsByPage);
-              return PostGetResponse.
+            getPostDTO(postsByPage);
+    return PostGetResponse.
 
-of(totalPages, postDTO);
-          }
+            of(totalPages, postDTO);
+}
 
 private List<PostDTO> getPostDTO(List<Post> posts) {
     return posts.stream()
