@@ -21,4 +21,7 @@ public interface SubscribeRepository extends JpaRepository<Subscribe, Long> {
     void deleteByPostAndUser(Post post, User user);
 
     void deleteAllByPost(Post post);
+
+    List<Subscribe> findAllByPost(Post post);
+
 }
