@@ -1,16 +1,26 @@
 package com.douunderstandapi.notification.service;
 
+import com.douunderstandapi.common.utils.discord.DiscordUtils;
+import com.douunderstandapi.common.utils.discord.dto.DiscordWebhookRequest;
 import com.douunderstandapi.common.utils.mail.EmailUtils;
 import com.douunderstandapi.common.utils.mail.dto.NotificationEmailDTO;
+import com.douunderstandapi.notification.event.NotificationFailEvent;
 import com.douunderstandapi.post.domain.Post;
-import com.douunderstandapi.subscribe.domain.Subscribe;
-import com.douunderstandapi.subscribe.repository.SubscribeRepository;
+import com.douunderstandapi.post.repository.PostRepository;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.repository.UserRepository;
-import java.util.Comparator;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,9 +31,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class NotificationService {
 
-    private final SubscribeRepository subscribeRepository;
+    @Value("${discord.webhook.server-url}")
+    private String discordServerUrl;
+
     private final UserRepository userRepository;
     private final EmailUtils emailUtils;
+    private final PostRepository postRepository;
+    private final ApplicationEventPublisher eventPublisher;
+    private final DiscordUtils discordUtils;
 
     @Scheduled(cron = "0 0 8 * * *")
     public void sendUnderstandNotificationInMorning() {
@@ -47,23 +62,73 @@ public class NotificationService {
         return userRepository.findAllByIsAllowedNotification(true);
     }
 
+
     private void sendPriorityPostsByEmail(List<User> users) {
+        Map<String, Boolean> map = users.parallelStream()
+                .collect(Collectors.toMap(User::getEmail, user -> false));
 
-        users.forEach(u -> {
-            List<Subscribe> subscribes = subscribeRepository.findAllByUser(u);
-
+        AtomicInteger noneSubscribeUserCountRef = new AtomicInteger();
+        AtomicInteger successNotificationCountRef = new AtomicInteger();
+        users.parallelStream().forEach(user -> {
             // 알람 신청한 지식중 알람 카운터가 가장 적은것을 하나 전송한다(Round Robin)
-            subscribes.stream()
-                    .map(Subscribe::getPost)
-                    .min(Comparator.comparing(Post::getNotificationCount))
-                    .ifPresent(k -> {
-                        k.increaseNotificationCount();
-                        sendEmail(u, k);
-                    });
+            Page<Post> postPage = postRepository.findPostWithMinNotificationCount(user,
+                    PageRequest.of(0, 1));
+            List<Post> posts = postPage.getContent();
+            String email = user.getEmail();
+            // post s가 비어있다면 구독한 포스트가 없다. retry 리스트에 포함되면 안되는 케이스
+            if (posts.isEmpty()) {
+                map.put(email, true);
+                noneSubscribeUserCountRef.getAndIncrement();
+                return;
+            }
+            try {
+                Post minNotificationCountPost = posts.getFirst();
+                minNotificationCountPost.increaseNotificationCount();
+                sendEmail(user, minNotificationCountPost);
+            } catch (Exception ex) {
+                log.warn(
+                        String.format(
+                                "cause={%s} msg={%s}",
+                                ex.getCause(), ex.getMessage()
+                        )
+                );
+                return;
+            }
+            map.put(email, true);
+            successNotificationCountRef.getAndIncrement();
         });
+
+        AtomicInteger failNotificationCountRef = new AtomicInteger();
+        // 맵에 false로 남아있다면 failEvent
+        map.keySet().forEach(failUserEmail -> {
+            Boolean isNotified = map.get(failUserEmail);
+            if (!isNotified) {
+                failNotificationCountRef.getAndIncrement();
+                eventPublisher.publishEvent(new NotificationFailEvent(failUserEmail));
+            }
+        });
+        map.clear();
+
+        // 이메일 알람 결과 리포트 웹훅 전송 로직
+        int successNotificationCount = successNotificationCountRef.get();
+        int noneSubscribeUserCount = noneSubscribeUserCountRef.get();
+        int failNotificationCount = failNotificationCountRef.get();
+        String reportContent = getEmailNotificationResultReport(successNotificationCount,
+                noneSubscribeUserCount, failNotificationCount);
+
+        discordUtils.sendDiscordWebhook(DiscordWebhookRequest.of(reportContent, discordServerUrl));
     }
 
     private void sendEmail(User user, Post post) {
         emailUtils.sendPostNotificationMessage(user.getEmail(), NotificationEmailDTO.from(post));
+    }
+
+    private String getEmailNotificationResultReport(int successCount, int noneSubscribeCount, int failCount) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm");
+
+        return "[" + LocalDateTime.now().format(formatter) + "]" +
+                " 이메일 알람 성공: " + successCount +
+                " 구독하지 않는 유저수: " + noneSubscribeCount +
+                " 이메일 알람 실패: " + failCount;
     }
 }
