@@ -325,3 +325,304 @@ public PostsGetResponse findPosts(String email, int pageNumber, String mode, Str
     - Error: 0.00%
     - 개선율: (502.7 - 463.9 / 502.7) * 100 → 약 7.78% 개선율
 - DB에서 한번에 가져오는 데이터량이 줄었고, TPS 또한 개선되었습니다.
+
+### 정기 구독 이메일 발송 성능 개선
+
+- 기존 정기 구독 이메일 발송 로직: DB에서 유저의 모든 구독 포스트 데이터를 조회하여 자바 로직으로 데이터를 추출
+- 해당 로직에서 DB에서 데이터를 비효율적으로 많이 가져와 속도가 나오지 않는 문제를 인식
+- 쿼리 개선을 통해 기존 11분 27초에서 6분 45초로 약5분 가량 속도를 개선시켰습니다.
+- 이후 parallelStream을 활용한 병렬처리로 6분 45초에서 12초로 약6분 속도를 개선하였습니다 (13core)
+
+#### 쿼리 개선 - 개선율 40.9%
+
+<details>
+<summary><strong> 기존 정기 구독 이메일 발송 로직 CODE - Click! </strong></summary>
+<div markdown="1">       
+
+````java
+private void sendPriorityPostsByEmail(List<User> users) {
+
+    users.forEach(u -> {
+        List<Subscribe> subscribes = subscribeRepository.findAllByUser(u);
+        // 알람 신청한 지식중 알람 카운터가 가장 적은것을 하나 전송한다(Round Robin)
+        subscribes.stream()
+                .map(Subscribe::getPost)
+                .min(Comparator.comparing(Post::getNotificationCount))
+                .ifPresent(post -> {
+                    post.increaseNotificationCount();
+                    sendMockEmail(u, post);
+                });
+    });
+}
+
+// 테스트용 Mock method
+private void sendMockEmail(User user, Post post) {
+    try {
+        Thread.sleep(10L);
+        // 재시도 로직 테스트시 사용
+        // if (user.getId() < 100L) {
+        // throw new RuntimeException() };
+    } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+    }
+
+}
+````
+
+</div>
+</details>
+
+<details>
+<summary><strong> 쿼리(JPQL) CODE - Click! </strong></summary>
+<div markdown="1">       
+
+````java
+
+@Query("SELECT s.post FROM Subscribe s WHERE s.user = :user ORDER BY s.post.notificationCount ASC ")
+Page<Post> findPostWithMinNotificationCount(@Param("user") User user, Pageable pageable);
+````
+
+</div>
+</details>
+
+<details>
+<summary><strong> 적용된 CODE - Click! </strong></summary>
+<div markdown="1">       
+
+````java
+private void sendPriorityPostsByEmail(List<User> users) {
+    users.forEach(u -> {
+        // 알람 신청한 지식중 알람 카운터가 가장 적은것을 하나 전송한다(Round Robin)
+        Page<Post> postPage = postRepository.findPostWithMinNotificationCount(user,
+                PageRequest.of(0, 1));
+        List<Post> posts = postPage.getContent();
+    });
+    if (posts.isEmpty()) {
+        return;
+    }
+    Post minNotificationCountPost = posts.getFirst();
+    minNotificationCountPost.increaseNotificationCount();
+    sendMockEmail(user, minNotificationCountPost);
+}
+````
+
+</div>
+</details>
+
+- 쿼리 개선 전
+  <img width="882" alt="noti_init" src="https://github.com/soonhankwon/self-news-api/assets/113872320/89b3ee0c-5b11-4c1d-94e2-50086f4b2844">
+- 쿼리 개선 후
+  <img width="882" alt="noti_query_v1" src="https://github.com/soonhankwon/self-news-api/assets/113872320/b6aaaa7c-7c74-4e3f-86ac-7b68d0543c35">
+    - TPS: 8.9/h
+    - Avg: 405154
+    - Max: 405154
+    - Error: 0.00%
+    - 개선율: (684956 - 405154 / 684956) * 100 → 약 40.84% 개선율
+
+#### parallelStream 활용 - 개선율 97.03%
+
+- 로직에 parallelStream울 활용하여 13core 사양에서 테스트했을 경우
+- 기존 6분 45초에서 약12초까지 성능이 개선되었습니다.
+- 하지만, 이메일 전송 외부 API가 해당 TPS를 소화할수 있을지?(OverWhelming 현상) 트래킹 및 테스트가 필요합니다.
+
+<details>
+<summary><strong> parallelStream 활용 CODE - Click! </strong></summary>
+<div markdown="1">       
+
+````java
+private void sendPriorityPostsByEmail(List<User> users) {
+    users.parallelStream().forEach(u -> {
+        // 알람 신청한 지식중 알람 카운터가 가장 적은것을 하나 전송한다(Round Robin)
+        Page<Post> postPage = postRepository.findPostWithMinNotificationCount(user,
+                PageRequest.of(0, 1));
+        List<Post> posts = postPage.getContent();
+    });
+    if (posts.isEmpty()) {
+        return;
+    }
+    Post minNotificationCountPost = posts.getFirst();
+    minNotificationCountPost.increaseNotificationCount();
+    sendEmail(user, minNotificationCountPost);
+}
+````
+
+</div>
+</details>
+
+### 이메일 알람 발송 예외 발생시 재시도 스케쥴링 및 결과 보고서 웹훅 로직 개발
+
+- 이메일 알람 발송시 실패한 알람의 경우 처리를 꼭 해줘야하는 문제를 인식했습니다.
+- 예를 들어 이메일 발송 루프에서 중간에 예외가 발생한다면 예외 발생 이후 이메일에는 모두 알람 발송이되지 않습니다.
+- 따라서 Try-Catch로 예외처리를 해주어 이 문제를 해결했고, 실패 이벤트를 발행해 재시도 Set에 이벤트를 넣어주었습니다.
+    - 이벤트 리스너에서 실패 이벤트를 재시도 Set에 넣어주는 메서드는 비동기처리(Async)하여 기존 로직과 흐름을 분리, 이메일 발송 로직에 영향을 최대한 미치지 않도록 합니다.
+- 각 알람발송 시점 30분 후 재시도 Set에 재시도할 실패 이벤트가 있다면 이메일을 재발송하도록 스케줄링했습니다.
+- 바로 실패한 요청을 retry하지 않는 이유 두 가지 입니다.
+    - 실패한 요청은 이메일 자체가 문제가 있을 수 있기 때문에 또 실패할 가능성이 높다고 예상됨
+    - 외부 API(이메일)의 문제일 경우 일정 시간 후 API의 장애가 회복되기를 기대할 수 있기 때문
+- 부가적으로 정기 알람 발송 결과와 재시도 알람의 결과 보고서를 바로 파악하기 위해서 보고서 웹훅 전송 로직을 추가했습니다.
+    - 1차 결과 보고서: 성공한 알람 갯수, 구독하지 않은 유저의수, 실패한 알람 갯수
+    - 2차 재시도 결과 보고서: 실패한 알람 갯수, 실패한 이메일 리스트
+
+<details>
+<summary><strong> 이메일 알람 발송 재시도 처리 및 웹훅 전송 CODE - Click! </strong></summary>
+<div markdown="1">       
+
+````java
+private void sendPriorityPostsByEmail(List<User> users) {
+    // 실패한 email을 파악하기 위해 map 생성
+    Map<String, Boolean> map = users.parallelStream()
+            .collect(Collectors.toMap(User::getEmail, user -> false));
+
+    AtomicInteger noneSubscribeUserCountRef = new AtomicInteger();
+    AtomicInteger successNotificationCountRef = new AtomicInteger();
+    users.parallelStream().forEach(user -> {
+        // 알람 신청한 지식중 알람 카운터가 가장 적은것을 하나 전송한다(Round Robin)
+        Page<Post> postPage = postRepository.findPostWithMinNotificationCount(user,
+                PageRequest.of(0, 1));
+        List<Post> posts = postPage.getContent();
+        String email = user.getEmail();
+        // posts가 비어있다면 구독한 포스트가 없다. retry 리스트에 포함되면 안되는 케이스
+        if (posts.isEmpty()) {
+            map.put(email, true);
+            noneSubscribeUserCountRef.getAndIncrement();
+            return;
+        }
+        try {
+            Post minNotificationCountPost = posts.getFirst();
+            minNotificationCountPost.increaseNotificationCount();
+            sendEmail(user, minNotificationCountPost);
+        } catch (Exception ex) {
+            log.warn(
+                    String.format(
+                            "cause={%s} msg={%s}",
+                            ex.getCause(), ex.getMessage()
+                    )
+            );
+            return;
+        }
+        map.put(email, true);
+        successNotificationCountRef.getAndIncrement();
+    });
+
+    AtomicInteger failNotificationCountRef = new AtomicInteger();
+    // 맵에 false로 남아있다면 failEvent
+    map.keySet().forEach(failUserEmail -> {
+        Boolean isNotified = map.get(failUserEmail);
+        if (!isNotified) {
+            failNotificationCountRef.getAndIncrement();
+            eventPublisher.publishEvent(new NotificationFailEvent(failUserEmail));
+        }
+    });
+    map.clear();
+
+    // 이메일 알람 결과 리포트 웹훅 전송 로직
+    int successNotificationCount = successNotificationCountRef.get();
+    int noneSubscribeUserCount = noneSubscribeUserCountRef.get();
+    int failNotificationCount = failNotificationCountRef.get();
+    String reportContent = getEmailNotificationResultReport(successNotificationCount,
+            noneSubscribeUserCount, failNotificationCount);
+
+    discordUtils.sendDiscordWebhook(DiscordWebhookRequest.of(reportContent, discordServerUrl));
+}
+````
+
+</div>
+</details>
+
+<details>
+<summary><strong> 이메일 알람 실패 이벤트 리스너 CODE - Click! </strong></summary>
+<div markdown="1">       
+
+````java
+
+@Slf4j
+@RequiredArgsConstructor
+@Component
+public class NotificationFailEventListener {
+
+    @Value("${discord.webhook.server-url}")
+    private String discordServerUrl;
+
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final EmailUtils emailUtils;
+    private final DiscordUtils discordUtils;
+    private final Set<NotificationFailEvent> retrySet = new HashSet<>();
+
+    @Async
+    @EventListener
+    public void handleNotificationFailEvent(NotificationFailEvent notificationFailEvent) {
+        retrySet.add(notificationFailEvent);
+    }
+
+    @Scheduled(cron = "0 30 08 * * *")
+    public void retryNotificationInMorning() {
+        retryNotification();
+    }
+
+    @Scheduled(cron = "0 30 13 * * *")
+    public void retryNotificationInAfternoon() {
+        retryNotification();
+    }
+
+    @Scheduled(cron = "0 30 20 * * *")
+    public void retryNotificationInEvening() {
+        retryNotification();
+    }
+
+    public void retryNotification() {
+        if (this.retrySet.isEmpty()) {
+            return;
+        }
+        try {
+            retrySet.forEach(failEvent -> {
+                String email = failEvent.email();
+                User retryUser = userRepository.findByEmail(email).orElseThrow();
+                Page<Post> postPage = postRepository.findPostWithMinNotificationCount(retryUser,
+                        PageRequest.of(0, 1));
+                List<Post> posts = postPage.getContent();
+                if (posts.isEmpty()) {
+                    return;
+                }
+                Post minCountPost = posts.getFirst();
+                minCountPost.increaseNotificationCount();
+                sendEmail(retryUser, minCountPost);
+                retrySet.remove(failEvent);
+            });
+        } catch (Exception ex) {
+            log.warn(
+                    String.format(
+                            "cause={%s} msg={%s}",
+                            ex.getCause(), ex.getMessage()
+                    )
+            );
+        }
+
+        StringBuilder sb = new StringBuilder();
+        retrySet.forEach(i -> sb.append(i.email()).append("\n"));
+        String failEmails = sb.toString();
+        String reportContent = getEmailRetryNotificationResultReport(retrySet.size(),
+                failEmails);
+        retrySet.clear();
+
+        discordUtils.sendDiscordWebhook(DiscordWebhookRequest.of(reportContent, discordServerUrl));
+    }
+
+    private void sendEmail(User user, Post post) {
+        emailUtils.sendPostNotificationMessage(user.getEmail(), NotificationEmailDTO.from(post));
+    }
+
+    private String getEmailRetryNotificationResultReport(int failCount, String failEmails) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm");
+
+        return "[" + LocalDateTime.now().format(formatter) + "]" +
+                " 이메일 알람 실패: " + failCount + " 실패 이메일 목록: " + failEmails;
+    }
+}
+````
+
+</div>
+</details>
+
+- 결과 보고서 디스코드 스크린샷
+  <img width="882" alt="discord_webhook" src="https://github.com/soonhankwon/self-news-api/assets/113872320/bc7e1016-1ff7-4238-9ed9-abfd59d4dca1">
