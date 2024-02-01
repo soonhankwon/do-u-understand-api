@@ -423,15 +423,37 @@ private void sendPriorityPostsByEmail(List<User> users) {
 
 #### 2차 쿼리 개선 - 개선율 약 9.39%
 
-- 기존 비효율적으로 수신가능 유저를 전부 조회한 후 이후 로직에서 구독포스트가 없는 유저를 판별하는 문제 인식
+- 알람수신 허용은 했지만, 구독포스트가 없는 유저들도 조회되는 문제가 발생했습니다.
+- 기존 로직에서는 자바 코드로 구독포스트가 없는 유저를 판별하여 비효율적인 연산이 들어가 이 부분을 개선하면 속도가 개선될 것이라고 판단
 - 유저와 구독 테이블을 조인해서 결과를 한번에 가져오도록 수정
 
 <details>
-<summary><strong> 쿼리(JPQL) CODE - Click! </strong></summary>
+<summary><strong> 기존 쿼리 CODE - Click! </strong></summary>
 <div markdown="1">       
 
 ````java
 
+@Scheduled(cron = "0 0 20 * * *")
+public void sendUnderstandNotificationInEvening() {
+    //수신허용을 했지만, 구독포스트가 없는 유저들도 조회되는 문제 발생
+    List<User> users = findUserByAllowedNotification();
+    sendPriorityPostsByEmail(users);
+}
+
+private List<User> findUserByAllowedNotification() {
+    return userRepository.findAllByIsAllowedNotification(true);
+}
+````
+
+</div>
+</details>
+
+<details>
+<summary><strong> 개선 쿼리(JPQL) CODE - Click! </strong></summary>
+<div markdown="1">       
+
+````java
+// 구독포스트가 없다면 결과에서 제외된다.
 @Query(value = "SELECT u FROM User u JOIN Subscribe s ON u.id = s.user.id WHERE u.isAllowedNotification = true ")
 List<User> findAllByIsAllowedNotificationExistsSubscribe();
 ````

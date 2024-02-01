@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     @Query(value = "SELECT u FROM User u JOIN Subscribe s ON u.id = s.user.id WHERE u.isAllowedNotification = true ")
-    List<User> findAllByIsAllowedNotificationExistsSubscribe();
+    List<User> findAllByIsAllowedNotificationAndExistsSubscribe();
 
     boolean existsByEmail(String email);
 }

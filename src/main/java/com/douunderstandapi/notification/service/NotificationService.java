@@ -42,26 +42,26 @@ public class NotificationService {
 
     @Scheduled(cron = "0 0 8 * * *")
     public void sendUnderstandNotificationInMorning() {
-        List<User> users = findUserByAllowedNotification();
+        List<User> users = findUserByAllowedNotificationAndExistsSubscribe();
         sendPriorityPostsByEmail(users);
     }
 
     @Scheduled(cron = "0 0 13 * * *")
     public void sendUnderstandNotificationInAfternoon() {
-        List<User> users = findUserByAllowedNotification();
+        List<User> users = findUserByAllowedNotificationAndExistsSubscribe();
         sendPriorityPostsByEmail(users);
     }
 
     @Scheduled(cron = "0 0 20 * * *")
     public void sendUnderstandNotificationInEvening() {
-        List<User> users = findUserByAllowedNotification();
+        List<User> users = findUserByAllowedNotificationAndExistsSubscribe();
         sendPriorityPostsByEmail(users);
     }
 
-    private List<User> findUserByAllowedNotification() {
-        return userRepository.findAllByIsAllowedNotificationExistsSubscribe();
+    private List<User> findUserByAllowedNotificationAndExistsSubscribe() {
+        return userRepository.findAllByIsAllowedNotificationAndExistsSubscribe();
     }
-    
+
     private void sendPriorityPostsByEmail(List<User> users) {
         Map<String, Boolean> map = users.parallelStream()
                 .collect(Collectors.toMap(User::getEmail, isNotified -> false));

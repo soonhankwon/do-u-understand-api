@@ -56,7 +56,7 @@ class NotificationServiceTest {
 
         Page<Post> postPage = new PageImpl<>(posts);
 
-        when(userRepository.findAllByIsAllowedNotificationExistsSubscribe())
+        when(userRepository.findAllByIsAllowedNotificationAndExistsSubscribe())
                 .thenReturn(users);
         when(postRepository.findPostWithMinNotificationCount(any(User.class), any(Pageable.class)))
                 .thenReturn(postPage);
@@ -79,7 +79,7 @@ class NotificationServiceTest {
 
         Page<Post> postPage = new PageImpl<>(posts);
 
-        when(userRepository.findAllByIsAllowedNotificationExistsSubscribe())
+        when(userRepository.findAllByIsAllowedNotificationAndExistsSubscribe())
                 .thenReturn(users);
         when(postRepository.findPostWithMinNotificationCount(any(User.class), any(Pageable.class)))
                 .thenReturn(postPage);
@@ -102,7 +102,7 @@ class NotificationServiceTest {
 
         Page<Post> postPage = new PageImpl<>(posts);
 
-        when(userRepository.findAllByIsAllowedNotificationExistsSubscribe())
+        when(userRepository.findAllByIsAllowedNotificationAndExistsSubscribe())
                 .thenReturn(users);
         when(postRepository.findPostWithMinNotificationCount(any(User.class), any(Pageable.class)))
                 .thenReturn(postPage);
