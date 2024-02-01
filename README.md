@@ -163,7 +163,7 @@ private List<PostDTO> getPostDTO(List<Post> posts) {
     - Avg: 4
     - Max: 27
     - Error: 0.00%
-    - 개선율: (246.5 - 224.9 / 224.9) * 100 → 9.58%
+    - 개선율: ((246.5 - 224.9) / 224.9) * 100 → 9.58%
 
 #### 2차: Map을 활용한 getPostDTO 코드 리팩토링 + parallelStream : 개선율 52.8%
 
@@ -236,7 +236,7 @@ private List<PostDTO> getPostDTO(List<Post> posts) {
     - Avg: 1
     - Max: 25
     - Error: 0.00%
-    - 개선율: (522.5 - 246.5 / 522.5) * 100 → 약 52.8%
+    - 개선율: ((522.5 - 246.5) / 522.5) * 100 → 약 52.8%
 
 ### 카테고리 포스트 목록 조회 API 성능 개선 - 쿼리 파라미터
 
@@ -323,17 +323,19 @@ public PostsGetResponse findPosts(String email, int pageNumber, String mode, Str
     - Avg: 1
     - Max: 18
     - Error: 0.00%
-    - 개선율: (502.7 - 463.9 / 502.7) * 100 → 약 7.78% 개선율
+    - 개선율: ((502.7 - 463.9) / 502.7) * 100 → 약 7.78% 개선율
 - DB에서 한번에 가져오는 데이터량이 줄었고, TPS 또한 개선되었습니다.
 
 ### 정기 구독 이메일 발송 성능 개선
 
 - 기존 정기 구독 이메일 발송 로직: DB에서 유저의 모든 구독 포스트 데이터를 조회하여 자바 로직으로 데이터를 추출
 - 해당 로직에서 DB에서 데이터를 비효율적으로 많이 가져와 속도가 나오지 않는 문제를 인식
-- 쿼리 개선을 통해 기존 11분 27초에서 6분 45초로 약5분 가량 속도를 개선시켰습니다.
+- 1차 쿼리 개선을 통해 기존 11분 27초에서 6분 45초로 약5분 가량 속도를 개선시켰습니다.
 - 이후 parallelStream을 활용한 병렬처리로 6분 45초에서 12초로 약6분 속도를 개선되었지만, 외부 이메일 전송 API가 병렬적으로 작업을 처리하지 못해 예외가 발생하여 hotfix
+- 2차 쿼리 개선을 통해 6분 45초에서 6분 11초로 개선
+- 1차, 2차 개선을 통해 11분 27초에서 6분 11초로 약 5분 성능 개선 (총 개선율 약 46.40%)
 
-#### 쿼리 개선 - 개선율 40.83%
+#### 1차 쿼리 개선 - 개선율 40.83%
 
 <details>
 <summary><strong> 기존 정기 구독 이메일 발송 로직 CODE - Click! </strong></summary>
@@ -411,13 +413,40 @@ private void sendPriorityPostsByEmail(List<User> users) {
 
 - 쿼리 개선 전
   <img width="882" alt="noti_init" src="https://github.com/soonhankwon/self-news-api/assets/113872320/89b3ee0c-5b11-4c1d-94e2-50086f4b2844">
-- 쿼리 개선 후
+- 1차 쿼리 개선 후
   <img width="882" alt="noti_query_v1" src="https://github.com/soonhankwon/self-news-api/assets/113872320/b6aaaa7c-7c74-4e3f-86ac-7b68d0543c35">
     - TPS: 8.9/h
     - Avg: 405154
     - Max: 405154
     - Error: 0.00%
-    - 개선율: (684956 - 405154 / 684956) * 100 → 약 40.84% 개선율
+    - 개선율: ((684956 - 405154) / 684956) * 100 → 약 40.84% 개선율
+
+#### 2차 쿼리 개선 - 개선율 약 9.39%
+
+- 기존 비효율적으로 수신가능 유저를 전부 조회한 후 이후 로직에서 구독포스트가 없는 유저를 판별하는 문제 인식
+- 유저와 구독 테이블을 조인해서 결과를 한번에 가져오도록 수정
+
+<details>
+<summary><strong> 쿼리(JPQL) CODE - Click! </strong></summary>
+<div markdown="1">       
+
+````java
+
+@Query(value = "SELECT u FROM User u JOIN Subscribe s ON u.id = s.user.id WHERE u.isAllowedNotification = true ")
+List<User> findAllByIsAllowedNotificationExistsSubscribe();
+````
+
+</div>
+</details>
+
+- 2차 쿼리 개선 후
+- 불필요한 데이터를 DB에서 조회하지 않아 메모리에서 처리할 데이터량이 감소(테스트에서 케이스 1,000건)
+  <img width="882" alt="noti_query_v2" src="https://github.com/soonhankwon/self-news-api/assets/113872320/1a53fd39-917d-4937-a10d-35a4929eff57">
+    - TPS: 9.8/h
+    - Avg: 367076
+    - Max: 367076
+    - Error: 0.00%
+    - 개선율: ((405154 - 367076)/ 405154) * 100 → 약 9.39% 개선율
 
 ### 이메일 알람 발송 예외 발생시 재시도 스케쥴링 및 결과 보고서 웹훅 로직 개발
 

@@ -1,7 +1,6 @@
 package com.douunderstandapi.notification.service;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -57,7 +56,7 @@ class NotificationServiceTest {
 
         Page<Post> postPage = new PageImpl<>(posts);
 
-        when(userRepository.findAllByIsAllowedNotification(anyBoolean()))
+        when(userRepository.findAllByIsAllowedNotificationExistsSubscribe())
                 .thenReturn(users);
         when(postRepository.findPostWithMinNotificationCount(any(User.class), any(Pageable.class)))
                 .thenReturn(postPage);
@@ -80,7 +79,7 @@ class NotificationServiceTest {
 
         Page<Post> postPage = new PageImpl<>(posts);
 
-        when(userRepository.findAllByIsAllowedNotification(anyBoolean()))
+        when(userRepository.findAllByIsAllowedNotificationExistsSubscribe())
                 .thenReturn(users);
         when(postRepository.findPostWithMinNotificationCount(any(User.class), any(Pageable.class)))
                 .thenReturn(postPage);
@@ -103,7 +102,7 @@ class NotificationServiceTest {
 
         Page<Post> postPage = new PageImpl<>(posts);
 
-        when(userRepository.findAllByIsAllowedNotification(anyBoolean()))
+        when(userRepository.findAllByIsAllowedNotificationExistsSubscribe())
                 .thenReturn(users);
         when(postRepository.findPostWithMinNotificationCount(any(User.class), any(Pageable.class)))
                 .thenReturn(postPage);

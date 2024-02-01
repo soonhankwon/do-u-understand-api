@@ -59,15 +59,13 @@ public class NotificationService {
     }
 
     private List<User> findUserByAllowedNotification() {
-        return userRepository.findAllByIsAllowedNotification(true);
+        return userRepository.findAllByIsAllowedNotificationExistsSubscribe();
     }
-
-
+    
     private void sendPriorityPostsByEmail(List<User> users) {
         Map<String, Boolean> map = users.parallelStream()
-                .collect(Collectors.toMap(User::getEmail, user -> false));
+                .collect(Collectors.toMap(User::getEmail, isNotified -> false));
 
-        AtomicInteger noneSubscribeUserCountRef = new AtomicInteger();
         AtomicInteger successNotificationCountRef = new AtomicInteger();
         users.forEach(user -> {
             // 알람 신청한 지식중 알람 카운터가 가장 적은것을 하나 전송한다(Round Robin)
@@ -75,12 +73,9 @@ public class NotificationService {
                     PageRequest.of(0, 1));
             List<Post> posts = postPage.getContent();
             String email = user.getEmail();
-            // post s가 비어있다면 구독한 포스트가 없다. retry 리스트에 포함되면 안되는 케이스
-            if (posts.isEmpty()) {
-                map.put(email, true);
-                noneSubscribeUserCountRef.getAndIncrement();
-                return;
-            }
+
+            assert !posts.isEmpty();
+
             try {
                 Post minNotificationCountPost = posts.getFirst();
                 minNotificationCountPost.increaseNotificationCount();
@@ -111,10 +106,8 @@ public class NotificationService {
 
         // 이메일 알람 결과 리포트 웹훅 전송 로직
         int successNotificationCount = successNotificationCountRef.get();
-        int noneSubscribeUserCount = noneSubscribeUserCountRef.get();
         int failNotificationCount = failNotificationCountRef.get();
-        String reportContent = getEmailNotificationResultReport(successNotificationCount,
-                noneSubscribeUserCount, failNotificationCount);
+        String reportContent = getEmailNotificationResultReport(successNotificationCount, failNotificationCount);
 
         discordUtils.sendDiscordWebhook(DiscordWebhookRequest.of(reportContent, discordServerUrl));
     }
@@ -123,12 +116,11 @@ public class NotificationService {
         emailUtils.sendPostNotificationMessage(user.getEmail(), NotificationEmailDTO.from(post));
     }
 
-    private String getEmailNotificationResultReport(int successCount, int noneSubscribeCount, int failCount) {
+    private String getEmailNotificationResultReport(int successCount, int failCount) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm");
 
         return "[" + LocalDateTime.now().format(formatter) + "]" +
                 " 이메일 알람 성공: " + successCount +
-                " 구독하지 않는 유저수: " + noneSubscribeCount +
                 " 이메일 알람 실패: " + failCount;
     }
 }
