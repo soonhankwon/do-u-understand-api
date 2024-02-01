@@ -2,13 +2,18 @@ package com.douunderstandapi.notification.service;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.douunderstandapi.category.domain.Category;
+import com.douunderstandapi.common.utils.discord.DiscordUtils;
+import com.douunderstandapi.common.utils.discord.dto.DiscordWebhookRequest;
 import com.douunderstandapi.common.utils.mail.EmailUtils;
-import com.douunderstandapi.subscribe.domain.Subscribe;
-import com.douunderstandapi.subscribe.repository.SubscribeRepository;
+import com.douunderstandapi.common.utils.mail.dto.NotificationEmailDTO;
+import com.douunderstandapi.post.domain.Post;
+import com.douunderstandapi.post.repository.PostRepository;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.repository.UserRepository;
 import java.util.List;
@@ -19,18 +24,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
 
     @Mock
-    private SubscribeRepository subscribeRepository;
-
-    @Mock
     private UserRepository userRepository;
 
     @Mock
+    private PostRepository postRepository;
+
+    @Mock
     private EmailUtils emailUtils;
+
+    @Mock
+    private DiscordUtils discordUtils;
 
     @Spy
     @InjectMocks
@@ -39,15 +50,20 @@ class NotificationServiceTest {
     @Test
     @DisplayName("포스트 알람 - 서비스 로직 테스트(아침)")
     void sendUnderstandNotificationInMorning() {
-        List<User> users = List.of(createUser());
-        List<Subscribe> subscribes = List.of();
+        User user = createUser();
+        Category category = new Category("java");
+        List<User> users = List.of(user);
+        List<Post> posts = List.of(Post.of("title", "content", "link", user, category));
+
+        Page<Post> postPage = new PageImpl<>(posts);
 
         when(userRepository.findAllByIsAllowedNotification(anyBoolean()))
                 .thenReturn(users);
-        when(subscribeRepository.findAllByUser(any(User.class)))
-                .thenReturn(subscribes);
-//        when(emailUtils.sendPostNotificationMessage(anyString(), any(NotificationEmailDTO.class)))
-//                .thenReturn("success");
+        when(postRepository.findPostWithMinNotificationCount(any(User.class), any(Pageable.class)))
+                .thenReturn(postPage);
+        when(emailUtils.sendPostNotificationMessage(any(String.class), any(NotificationEmailDTO.class)))
+                .thenReturn("success");
+        doNothing().when(discordUtils).sendDiscordWebhook(any(DiscordWebhookRequest.class));
 
         notificationService.sendUnderstandNotificationInMorning();
 
@@ -57,37 +73,47 @@ class NotificationServiceTest {
     @Test
     @DisplayName("포스트 알람 - 서비스 로직 테스트(점심)")
     void sendUnderstandNotificationInAfternoon() {
-        List<User> users = List.of(createUser());
-        List<Subscribe> subscribes = List.of();
+        User user = createUser();
+        Category category = new Category("java");
+        List<User> users = List.of(user);
+        List<Post> posts = List.of(Post.of("title", "content", "link", user, category));
+
+        Page<Post> postPage = new PageImpl<>(posts);
 
         when(userRepository.findAllByIsAllowedNotification(anyBoolean()))
                 .thenReturn(users);
-        when(subscribeRepository.findAllByUser(any(User.class)))
-                .thenReturn(subscribes);
-//        when(emailUtils.sendPostNotificationMessage(anyString(), any(NotificationEmailDTO.class)))
-//                .thenReturn("success");
+        when(postRepository.findPostWithMinNotificationCount(any(User.class), any(Pageable.class)))
+                .thenReturn(postPage);
+        when(emailUtils.sendPostNotificationMessage(any(String.class), any(NotificationEmailDTO.class)))
+                .thenReturn("success");
+        doNothing().when(discordUtils).sendDiscordWebhook(any(DiscordWebhookRequest.class));
 
-        notificationService.sendUnderstandNotificationInEvening();
+        notificationService.sendUnderstandNotificationInAfternoon();
 
-        verify(notificationService, times(1)).sendUnderstandNotificationInEvening();
+        verify(notificationService, times(1)).sendUnderstandNotificationInAfternoon();
     }
 
     @Test
     @DisplayName("포스트 알람 - 서비스 로직 테스트(저녁)")
     void sendUnderstandNotificationInEvening() {
-        List<User> users = List.of(createUser());
-        List<Subscribe> subscribes = List.of();
+        User user = createUser();
+        Category category = new Category("java");
+        List<User> users = List.of(user);
+        List<Post> posts = List.of(Post.of("title", "content", "link", user, category));
+
+        Page<Post> postPage = new PageImpl<>(posts);
 
         when(userRepository.findAllByIsAllowedNotification(anyBoolean()))
                 .thenReturn(users);
-        when(subscribeRepository.findAllByUser(any(User.class)))
-                .thenReturn(subscribes);
-//        when(emailUtils.sendPostNotificationMessage(anyString(), any(NotificationEmailDTO.class)))
-//                .thenReturn("success");
+        when(postRepository.findPostWithMinNotificationCount(any(User.class), any(Pageable.class)))
+                .thenReturn(postPage);
+        when(emailUtils.sendPostNotificationMessage(any(String.class), any(NotificationEmailDTO.class)))
+                .thenReturn("success");
+        doNothing().when(discordUtils).sendDiscordWebhook(any(DiscordWebhookRequest.class));
 
-        notificationService.sendUnderstandNotificationInAfternoon();
+        notificationService.sendUnderstandNotificationInEvening();
 
-        verify(notificationService, times(1)).sendUnderstandNotificationInAfternoon();
+        verify(notificationService, times(1)).sendUnderstandNotificationInEvening();
     }
 
     private User createUser() {
