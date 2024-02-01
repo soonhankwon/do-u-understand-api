@@ -331,9 +331,9 @@ public PostsGetResponse findPosts(String email, int pageNumber, String mode, Str
 - 기존 정기 구독 이메일 발송 로직: DB에서 유저의 모든 구독 포스트 데이터를 조회하여 자바 로직으로 데이터를 추출
 - 해당 로직에서 DB에서 데이터를 비효율적으로 많이 가져와 속도가 나오지 않는 문제를 인식
 - 쿼리 개선을 통해 기존 11분 27초에서 6분 45초로 약5분 가량 속도를 개선시켰습니다.
-- 이후 parallelStream을 활용한 병렬처리로 6분 45초에서 12초로 약6분 속도를 개선하였습니다 (13core)
+- 이후 parallelStream을 활용한 병렬처리로 6분 45초에서 12초로 약6분 속도를 개선되었지만, 외부 이메일 전송 API가 병렬적으로 작업을 처리하지 못해 예외가 발생하여 hotfix
 
-#### 쿼리 개선 - 개선율 40.9%
+#### 쿼리 개선 - 개선율 40.83%
 
 <details>
 <summary><strong> 기존 정기 구독 이메일 발송 로직 CODE - Click! </strong></summary>
@@ -418,36 +418,6 @@ private void sendPriorityPostsByEmail(List<User> users) {
     - Max: 405154
     - Error: 0.00%
     - 개선율: (684956 - 405154 / 684956) * 100 → 약 40.84% 개선율
-
-#### parallelStream 활용 - 개선율 97.03%
-
-- 로직에 parallelStream울 활용하여 13core 사양에서 테스트했을 경우
-- 기존 6분 45초에서 약12초까지 성능이 개선되었습니다.
-- 하지만, 이메일 전송 외부 API가 해당 TPS를 소화할수 있을지?(OverWhelming 현상) 트래킹 및 테스트가 필요합니다.
-
-<details>
-<summary><strong> parallelStream 활용 CODE - Click! </strong></summary>
-<div markdown="1">       
-
-````java
-private void sendPriorityPostsByEmail(List<User> users) {
-    users.parallelStream().forEach(u -> {
-        // 알람 신청한 지식중 알람 카운터가 가장 적은것을 하나 전송한다(Round Robin)
-        Page<Post> postPage = postRepository.findPostWithMinNotificationCount(user,
-                PageRequest.of(0, 1));
-        List<Post> posts = postPage.getContent();
-    });
-    if (posts.isEmpty()) {
-        return;
-    }
-    Post minNotificationCountPost = posts.getFirst();
-    minNotificationCountPost.increaseNotificationCount();
-    sendEmail(user, minNotificationCountPost);
-}
-````
-
-</div>
-</details>
 
 ### 이메일 알람 발송 예외 발생시 재시도 스케쥴링 및 결과 보고서 웹훅 로직 개발
 
