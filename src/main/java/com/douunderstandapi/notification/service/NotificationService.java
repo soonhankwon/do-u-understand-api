@@ -69,7 +69,7 @@ public class NotificationService {
 
         AtomicInteger noneSubscribeUserCountRef = new AtomicInteger();
         AtomicInteger successNotificationCountRef = new AtomicInteger();
-        users.parallelStream().forEach(user -> {
+        users.forEach(user -> {
             // 알람 신청한 지식중 알람 카운터가 가장 적은것을 하나 전송한다(Round Robin)
             Page<Post> postPage = postRepository.findPostWithMinNotificationCount(user,
                     PageRequest.of(0, 1));
