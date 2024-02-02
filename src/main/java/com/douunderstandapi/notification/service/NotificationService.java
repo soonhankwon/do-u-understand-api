@@ -7,7 +7,6 @@ import com.douunderstandapi.common.utils.mail.dto.NotificationEmailDTO;
 import com.douunderstandapi.notification.event.NotificationFailEvent;
 import com.douunderstandapi.post.domain.Post;
 import com.douunderstandapi.post.repository.PostRepository;
-import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -42,44 +41,43 @@ public class NotificationService {
 
     @Scheduled(cron = "0 0 8 * * *")
     public void sendUnderstandNotificationInMorning() {
-        List<User> users = findUserByAllowedNotificationAndExistsSubscribe();
-        sendPriorityPostsByEmail(users);
+        List<String> emails = findEmailsByAllowedNotificationAndExistsSubscribe();
+        sendPriorityPostsByEmail(emails);
     }
 
     @Scheduled(cron = "0 0 13 * * *")
     public void sendUnderstandNotificationInAfternoon() {
-        List<User> users = findUserByAllowedNotificationAndExistsSubscribe();
-        sendPriorityPostsByEmail(users);
+        List<String> emails = findEmailsByAllowedNotificationAndExistsSubscribe();
+        sendPriorityPostsByEmail(emails);
     }
 
     @Scheduled(cron = "0 0 20 * * *")
     public void sendUnderstandNotificationInEvening() {
-        List<User> users = findUserByAllowedNotificationAndExistsSubscribe();
-        sendPriorityPostsByEmail(users);
+        List<String> emails = findEmailsByAllowedNotificationAndExistsSubscribe();
+        sendPriorityPostsByEmail(emails);
     }
 
-    private List<User> findUserByAllowedNotificationAndExistsSubscribe() {
-        return userRepository.findAllByIsAllowedNotificationAndExistsSubscribe();
+    private List<String> findEmailsByAllowedNotificationAndExistsSubscribe() {
+        return userRepository.findAllByIsAllowedNotificationAndExistsSubscribeWithCoveringIndex();
     }
 
-    private void sendPriorityPostsByEmail(List<User> users) {
-        Map<String, Boolean> map = users.parallelStream()
-                .collect(Collectors.toMap(User::getEmail, isNotified -> false));
+    private void sendPriorityPostsByEmail(List<String> emails) {
+        Map<String, Boolean> map = emails.parallelStream()
+                .collect(Collectors.toMap(e -> e, isNotified -> false));
 
         AtomicInteger successNotificationCountRef = new AtomicInteger();
-        users.forEach(user -> {
+        emails.forEach(email -> {
             // 알람 신청한 지식중 알람 카운터가 가장 적은것을 하나 전송한다(Round Robin)
-            Page<Post> postPage = postRepository.findPostWithMinNotificationCount(user,
+            Page<Post> postPage = postRepository.findPostWithMinNotificationCount(email,
                     PageRequest.of(0, 1));
             List<Post> posts = postPage.getContent();
-            String email = user.getEmail();
 
             assert !posts.isEmpty();
 
             try {
                 Post minNotificationCountPost = posts.getFirst();
                 minNotificationCountPost.increaseNotificationCount();
-                sendEmail(user, minNotificationCountPost);
+                sendEmail(email, minNotificationCountPost);
             } catch (Exception ex) {
                 log.warn(
                         String.format(
@@ -112,8 +110,8 @@ public class NotificationService {
         discordUtils.sendDiscordWebhook(DiscordWebhookRequest.of(reportContent, discordServerUrl));
     }
 
-    private void sendEmail(User user, Post post) {
-        emailUtils.sendPostNotificationMessage(user.getEmail(), NotificationEmailDTO.from(post));
+    private void sendEmail(String email, Post post) {
+        emailUtils.sendPostNotificationMessage(email, NotificationEmailDTO.from(post));
     }
 
     private String getEmailNotificationResultReport(int successCount, int failCount) {

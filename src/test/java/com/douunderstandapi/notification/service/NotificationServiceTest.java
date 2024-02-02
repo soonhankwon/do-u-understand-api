@@ -51,14 +51,14 @@ class NotificationServiceTest {
     void sendUnderstandNotificationInMorning() {
         User user = createUser();
         Category category = new Category("java");
-        List<User> users = List.of(user);
+        List<String> emails = List.of("test@gmail.com");
         List<Post> posts = List.of(Post.of("title", "content", "link", user, category));
 
         Page<Post> postPage = new PageImpl<>(posts);
 
-        when(userRepository.findAllByIsAllowedNotificationAndExistsSubscribe())
-                .thenReturn(users);
-        when(postRepository.findPostWithMinNotificationCount(any(User.class), any(Pageable.class)))
+        when(userRepository.findAllByIsAllowedNotificationAndExistsSubscribeWithCoveringIndex())
+                .thenReturn(emails);
+        when(postRepository.findPostWithMinNotificationCount(any(String.class), any(Pageable.class)))
                 .thenReturn(postPage);
         when(emailUtils.sendPostNotificationMessage(any(String.class), any(NotificationEmailDTO.class)))
                 .thenReturn("success");
@@ -74,14 +74,14 @@ class NotificationServiceTest {
     void sendUnderstandNotificationInAfternoon() {
         User user = createUser();
         Category category = new Category("java");
-        List<User> users = List.of(user);
+        List<String> emails = List.of("test@gmail.com");
         List<Post> posts = List.of(Post.of("title", "content", "link", user, category));
 
         Page<Post> postPage = new PageImpl<>(posts);
 
-        when(userRepository.findAllByIsAllowedNotificationAndExistsSubscribe())
-                .thenReturn(users);
-        when(postRepository.findPostWithMinNotificationCount(any(User.class), any(Pageable.class)))
+        when(userRepository.findAllByIsAllowedNotificationAndExistsSubscribeWithCoveringIndex())
+                .thenReturn(emails);
+        when(postRepository.findPostWithMinNotificationCount(any(String.class), any(Pageable.class)))
                 .thenReturn(postPage);
         when(emailUtils.sendPostNotificationMessage(any(String.class), any(NotificationEmailDTO.class)))
                 .thenReturn("success");
@@ -97,14 +97,14 @@ class NotificationServiceTest {
     void sendUnderstandNotificationInEvening() {
         User user = createUser();
         Category category = new Category("java");
-        List<User> users = List.of(user);
+        List<String> emails = List.of("test@gmail.com");
         List<Post> posts = List.of(Post.of("title", "content", "link", user, category));
 
         Page<Post> postPage = new PageImpl<>(posts);
 
-        when(userRepository.findAllByIsAllowedNotificationAndExistsSubscribe())
-                .thenReturn(users);
-        when(postRepository.findPostWithMinNotificationCount(any(User.class), any(Pageable.class)))
+        when(userRepository.findAllByIsAllowedNotificationAndExistsSubscribeWithCoveringIndex())
+                .thenReturn(emails);
+        when(postRepository.findPostWithMinNotificationCount(any(String.class), any(Pageable.class)))
                 .thenReturn(postPage);
         when(emailUtils.sendPostNotificationMessage(any(String.class), any(NotificationEmailDTO.class)))
                 .thenReturn("success");

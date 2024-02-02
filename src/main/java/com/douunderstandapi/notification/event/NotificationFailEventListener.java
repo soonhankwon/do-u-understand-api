@@ -6,8 +6,6 @@ import com.douunderstandapi.common.utils.mail.EmailUtils;
 import com.douunderstandapi.common.utils.mail.dto.NotificationEmailDTO;
 import com.douunderstandapi.post.domain.Post;
 import com.douunderstandapi.post.repository.PostRepository;
-import com.douunderstandapi.user.domain.User;
-import com.douunderstandapi.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
@@ -32,7 +30,6 @@ public class NotificationFailEventListener {
     private String discordServerUrl;
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
     private final EmailUtils emailUtils;
     private final DiscordUtils discordUtils;
     private final Set<NotificationFailEvent> retrySet = new HashSet<>();
@@ -65,8 +62,7 @@ public class NotificationFailEventListener {
         try {
             retrySet.forEach(failEvent -> {
                 String email = failEvent.email();
-                User retryUser = userRepository.findByEmail(email).orElseThrow();
-                Page<Post> postPage = postRepository.findPostWithMinNotificationCount(retryUser,
+                Page<Post> postPage = postRepository.findPostWithMinNotificationCount(email,
                         PageRequest.of(0, 1));
                 List<Post> posts = postPage.getContent();
                 if (posts.isEmpty()) {
@@ -74,7 +70,7 @@ public class NotificationFailEventListener {
                 }
                 Post minCountPost = posts.getFirst();
                 minCountPost.increaseNotificationCount();
-                sendEmail(retryUser, minCountPost);
+                sendEmail(email, minCountPost);
                 retrySet.remove(failEvent);
             });
         } catch (Exception ex) {
@@ -96,8 +92,8 @@ public class NotificationFailEventListener {
         discordUtils.sendDiscordWebhook(DiscordWebhookRequest.of(reportContent, discordServerUrl));
     }
 
-    private void sendEmail(User user, Post post) {
-        emailUtils.sendPostNotificationMessage(user.getEmail(), NotificationEmailDTO.from(post));
+    private void sendEmail(String email, Post post) {
+        emailUtils.sendPostNotificationMessage(email, NotificationEmailDTO.from(post));
     }
 
     private String getEmailRetryNotificationResultReport(int failCount, String failEmails) {
