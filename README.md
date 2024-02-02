@@ -333,7 +333,8 @@ public PostsGetResponse findPosts(String email, int pageNumber, String mode, Str
 - 1차 쿼리 개선을 통해 기존 11분 27초에서 6분 45초로 약5분 가량 속도를 개선시켰습니다.
 - 이후 parallelStream을 활용한 병렬처리로 6분 45초에서 12초로 약6분 속도를 개선되었지만, 외부 이메일 전송 API가 병렬적으로 작업을 처리하지 못해 예외가 발생하여 hotfix
 - 2차 쿼리 개선을 통해 6분 45초에서 6분 11초로 개선
-- 1차, 2차 개선을 통해 11분 27초에서 6분 11초로 약 5분 성능 개선 (총 개선율 약 46.40%)
+- 이후 2차 쿼리에서 커버링 인덱스가 적용되지 않은 문제점을 해결하여 6분 11초에서 3분 45초로 개선
+- 1차, 2차, 3차 개선을 통해 11분 27초에서 3분 45초로 약 7분 성능 개선 (총 개선율 약 67.36%)
 
 #### 1차 쿼리 개선 - 개선율 40.83%
 
@@ -470,6 +471,62 @@ List<User> findAllByIsAllowedNotificationExistsSubscribe();
     - Error: 0.00%
     - 개선율: ((405154 - 367076)/ 405154) * 100 → 약 9.39% 개선율
 
+#### 3차 쿼리 개선 - 커버링 인덱스 적용 개선율 약 39.01%
+
+- 2차 쿼리 개선 이후 쿼리 실행계획(EXPLAIN)을 조회해보니 커버링 인덱스가 적용되지 않은 문제를 발견했습니다.
+
+<details>
+<summary><strong> 기존 쿼리(JPQL) CODE - Click! </strong></summary>
+<div markdown="1">       
+
+````java
+// 구독포스트가 없다면 결과에서 제외된다.
+@Query(value = "SELECT distinct u FROM User u JOIN Subscribe s ON u.id = s.user.id WHERE u.isAllowedNotification = true ")
+List<User> findAllByIsAllowedNotificationExistsSubscribe();
+````
+
+</div>
+</details>
+
+- 해당 문제를 해결하기 위해 SQL을 수정하면서 쿼리 코스트를 비교했고 그 결과 다음과 같이 쿼리를 수정했습니다.
+
+<details>
+<summary><strong> 개선 쿼리(JPQL) 커버링 인덱스 적용 CODE - Click! </strong></summary>
+<div markdown="1">       
+
+````java
+
+@Query(value = "SELECT distinct u.email FROM User u JOIN Subscribe s ON u.id = s.user.id WHERE u.isAllowedNotification = true ")
+List<String> findAllByIsAllowedNotificationAndExistsSubscribeWithCoveringIndex();
+````
+
+</div>
+</details>
+
+- 변경 전 쿼리 실행 계획
+
+  ![noti_query_v2_query_plan](https://github.com/soonhankwon/self-news-api/assets/113872320/46bbf305-25be-4863-bb5c-c36ee623dec4)
+- 변경 후 쿼리 실행 계획
+
+  ![noti_query_v3_query_plan](https://github.com/soonhankwon/self-news-api/assets/113872320/0619c091-d6dd-4f46-9401-77c6832d9aba)
+- 변경 전 쿼리 코스트
+
+  ![noti_query_v2_query_cost](https://github.com/soonhankwon/self-news-api/assets/113872320/31b5aaf6-0400-4de6-9b08-83d202e9dc1a)
+- 변경 후 쿼리 코스트
+
+  ![noti_query_v3_query_cost](https://github.com/soonhankwon/self-news-api/assets/113872320/89f8b0db-cff9-4b2e-aa38-ca5687de09d4)
+
+- 인덱스가 생성된 이메일을 select 하면서 커버링 인덱스가 적용되었습니다.(using index)
+  <img width="882" alt="noti_query_v3_covering" src="https://github.com/soonhankwon/self-news-api/assets/113872320/c20989c0-476e-4f29-ac2e-e390e9cda97b">
+    - TPS: 16.1/h
+    - Avg: 223867
+    - Max: 223867
+    - Error: 0.00%
+    - 개선율: ((367076 - 223867)/ 367076) * 100 → 약 39.01% 개선율
+
+- 부가적으로 해당 쿼리를 사용한 로직들을 리팩토링했습니다. 기존 유저객체를 사용하던 로직을 email로 사용하게 되어 효율적인 코드로 리팩토링 되었습니다.
+    - https://github.com/soonhankwon/self-news-api/commit/6b50893d30b13198f3af30f74b6a92bd59b8e26d#diff-6601ccac1eafa7fe91600eec09ed64369ec6f0f0a9d789def76efe809407e9e5
+
 ### 이메일 알람 발송 예외 발생시 재시도 스케쥴링 및 결과 보고서 웹훅 로직 개발
 
 - 이메일 알람 발송시 실패한 알람의 경우 처리를 꼭 해줘야하는 문제를 인식했습니다.
@@ -489,29 +546,23 @@ List<User> findAllByIsAllowedNotificationExistsSubscribe();
 <div markdown="1">       
 
 ````java
-private void sendPriorityPostsByEmail(List<User> users) {
-    // 실패한 email을 파악하기 위해 map 생성
-    Map<String, Boolean> map = users.parallelStream()
-            .collect(Collectors.toMap(User::getEmail, user -> false));
+private void sendPriorityPostsByEmail(List<String> emails) {
+    Map<String, Boolean> map = emails.parallelStream()
+            .collect(Collectors.toMap(e -> e, isNotified -> false));
 
-    AtomicInteger noneSubscribeUserCountRef = new AtomicInteger();
     AtomicInteger successNotificationCountRef = new AtomicInteger();
-    users.parallelStream().forEach(user -> {
-        // 알람 신청한 지식중 알람 카운터가 가장 적은것을 하나 전송한다(Round Robin)
-        Page<Post> postPage = postRepository.findPostWithMinNotificationCount(user,
+    emails.forEach(email -> {
+        // 알람 신청한 포스트중 알람 카운터가 가장 적은것을 하나 전송한다(Round Robin)
+        Page<Post> postPage = postRepository.findPostWithMinNotificationCount(email,
                 PageRequest.of(0, 1));
         List<Post> posts = postPage.getContent();
-        String email = user.getEmail();
-        // posts가 비어있다면 구독한 포스트가 없다. retry 리스트에 포함되면 안되는 케이스
-        if (posts.isEmpty()) {
-            map.put(email, true);
-            noneSubscribeUserCountRef.getAndIncrement();
-            return;
-        }
+
+        assert !posts.isEmpty();
+
         try {
             Post minNotificationCountPost = posts.getFirst();
             minNotificationCountPost.increaseNotificationCount();
-            sendEmail(user, minNotificationCountPost);
+            sendEmail(email, minNotificationCountPost);
         } catch (Exception ex) {
             log.warn(
                     String.format(
@@ -538,10 +589,8 @@ private void sendPriorityPostsByEmail(List<User> users) {
 
     // 이메일 알람 결과 리포트 웹훅 전송 로직
     int successNotificationCount = successNotificationCountRef.get();
-    int noneSubscribeUserCount = noneSubscribeUserCountRef.get();
     int failNotificationCount = failNotificationCountRef.get();
-    String reportContent = getEmailNotificationResultReport(successNotificationCount,
-            noneSubscribeUserCount, failNotificationCount);
+    String reportContent = getEmailNotificationResultReport(successNotificationCount, failNotificationCount);
 
     discordUtils.sendDiscordWebhook(DiscordWebhookRequest.of(reportContent, discordServerUrl));
 }
@@ -565,7 +614,6 @@ public class NotificationFailEventListener {
     private String discordServerUrl;
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
     private final EmailUtils emailUtils;
     private final DiscordUtils discordUtils;
     private final Set<NotificationFailEvent> retrySet = new HashSet<>();
@@ -598,8 +646,7 @@ public class NotificationFailEventListener {
         try {
             retrySet.forEach(failEvent -> {
                 String email = failEvent.email();
-                User retryUser = userRepository.findByEmail(email).orElseThrow();
-                Page<Post> postPage = postRepository.findPostWithMinNotificationCount(retryUser,
+                Page<Post> postPage = postRepository.findPostWithMinNotificationCount(email,
                         PageRequest.of(0, 1));
                 List<Post> posts = postPage.getContent();
                 if (posts.isEmpty()) {
@@ -607,7 +654,7 @@ public class NotificationFailEventListener {
                 }
                 Post minCountPost = posts.getFirst();
                 minCountPost.increaseNotificationCount();
-                sendEmail(retryUser, minCountPost);
+                sendEmail(email, minCountPost);
                 retrySet.remove(failEvent);
             });
         } catch (Exception ex) {
@@ -629,8 +676,8 @@ public class NotificationFailEventListener {
         discordUtils.sendDiscordWebhook(DiscordWebhookRequest.of(reportContent, discordServerUrl));
     }
 
-    private void sendEmail(User user, Post post) {
-        emailUtils.sendPostNotificationMessage(user.getEmail(), NotificationEmailDTO.from(post));
+    private void sendEmail(String email, Post post) {
+        emailUtils.sendPostNotificationMessage(email, NotificationEmailDTO.from(post));
     }
 
     private String getEmailRetryNotificationResultReport(int failCount, String failEmails) {
