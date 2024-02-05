@@ -152,17 +152,18 @@ public class PostService {
     }
 
     private List<PostDTO> getPostDTO(List<Post> posts) {
-        Map<Post, Long> commentCounts = posts.parallelStream()
-                .collect(Collectors.toMap(post -> post, commentRepository::countAllByPost));
-        Map<Post, List<Subscribe>> subscribesByPost = posts.parallelStream()
-                .collect(Collectors.toMap(post -> post, subscribeRepository::findAllByPost));
+        Map<Long, Long> commentCounts = posts.parallelStream()
+                .collect(Collectors.toMap(Post::getId, commentRepository::countAllByPost));
+        Map<Long, List<Subscribe>> subscribesByPost = posts.parallelStream()
+                .collect(Collectors.toMap(Post::getId, subscribeRepository::findAllByPost));
 
         return posts.stream()
                 .map(post -> {
-                    Long commentCount = commentCounts.get(post);
-                    List<Subscribe> subscribes = subscribesByPost.get(post);
+                    Long postId = post.getId();
+                    Long commentCount = commentCounts.get(postId);
+                    List<Subscribe> subscribes = subscribesByPost.get(postId);
                     boolean isSubscribed = subscribes.stream()
-                            .anyMatch(subscribe -> Objects.equals(subscribe.getPost(), post));
+                            .anyMatch(subscribe -> Objects.equals(subscribe.getPost().getId(), postId));
                     return PostDTO.of(post, commentCount, isSubscribed);
                 })
                 .collect(Collectors.toList());
