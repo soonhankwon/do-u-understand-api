@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SubscribeRepository extends JpaRepository<Subscribe, Long> {
-    List<Subscribe> findAllByUser(User user);
 
     Page<Subscribe> findAllByUser(User user, Pageable pageable);
 
