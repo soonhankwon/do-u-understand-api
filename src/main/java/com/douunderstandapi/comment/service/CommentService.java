@@ -36,7 +36,7 @@ public class CommentService {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_EXIST_POST_ID));
-        
+
         post.validateAccessAuth(user);
 
         List<CommentDTO> commentDTOs = commentRepository.findAllByPost(post)
@@ -44,7 +44,7 @@ public class CommentService {
                 .map(CommentDTO::of)
                 .toList();
 
-        return new CommentsGetResponse(commentDTOs);
+        return CommentsGetResponse.from(commentDTOs);
     }
 
     @Transactional
