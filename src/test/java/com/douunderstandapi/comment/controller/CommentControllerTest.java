@@ -58,7 +58,7 @@ class CommentControllerTest {
     @Test
     void getComments() throws Exception {
         Long postId = 1L;
-        when(commentService.getComments(anyString(), anyLong()))
+        when(commentService.findComments(anyString(), anyLong()))
                 .thenReturn(createCommentsGetResponse(postId));
         mvc.perform(
                         RestDocumentationRequestBuilders.get("/api/v1/comments/{postId}", 1)

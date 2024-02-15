@@ -32,7 +32,7 @@ public class CommentController {
     public ResponseEntity<CommentsGetResponse> getComments(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                            @PathVariable Long postId) {
         String email = getEmailFromUserDetails(userDetails);
-        CommentsGetResponse res = commentService.getComments(email, postId);
+        CommentsGetResponse res = commentService.findComments(email, postId);
         return ResponseEntity.ok().body(res);
     }
 
