@@ -16,11 +16,14 @@ import com.douunderstandapi.post.dto.request.PostUpdateRequest;
 import com.douunderstandapi.post.dto.response.PostAddResponse;
 import com.douunderstandapi.post.dto.response.PostGetResponse;
 import com.douunderstandapi.post.dto.response.PostUpdateResponse;
+import com.douunderstandapi.post.dto.response.PostsGetResponse;
+import com.douunderstandapi.post.enumType.PostStatus;
 import com.douunderstandapi.post.repository.PostRepository;
 import com.douunderstandapi.subscribe.domain.Subscribe;
 import com.douunderstandapi.subscribe.repository.SubscribeRepository;
 import com.douunderstandapi.user.domain.User;
 import com.douunderstandapi.user.repository.UserRepository;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +31,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class PostServiceTest {
@@ -262,6 +268,55 @@ class PostServiceTest {
                 .isInstanceOf(CustomException.class);
     }
 
+    @Test
+    @DisplayName("포스트 목록 조회 - mode: all(공지)")
+    void findPosts() {
+        String email = "test1@gmail.com";
+        User user = createUser(email);
+
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(postRepository.findAllByPostStatus(any(PostStatus.class), any(Pageable.class)))
+                .thenReturn(createPostPage(user));
+
+        PostsGetResponse response = postService.findPosts(email, 0, "all", null);
+
+        assertThat(response.totalPageCount()).isEqualTo(1L);
+        assertThat(response.postList().getFirst().link()).isEqualTo("https://sdnksnd/sds123");
+    }
+
+    @Test
+    @DisplayName("포스트 목록 조회 - mode: not all && query: not null && not empty")
+    void findPosts_mode_not_all_query_not_null() {
+        String email = "test1@gmail.com";
+        User user = createUser(email);
+
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(postRepository.findAllByUserAndCategory_Name(any(User.class), anyString(), any(Pageable.class)))
+                .thenReturn(createPostPage(user));
+
+        PostsGetResponse response = postService.findPosts(email, 0, "my", "java");
+
+        assertThat(response.totalPageCount()).isEqualTo(1L);
+        assertThat(response.postList().getFirst().categoryName()).isEqualTo("java");
+    }
+
+    @Test
+    @DisplayName("포스트 목록 조회 - mode: not all && query: null || empty")
+    void findPosts_mode_not_all_query_null() {
+        String email = "test1@gmail.com";
+        User user = createUser(email);
+
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(postRepository.findAllByUser(any(User.class), any(Pageable.class)))
+                .thenReturn(createPostPage(user));
+
+        PostsGetResponse response1 = postService.findPosts(email, 0, "my", null);
+        PostsGetResponse response2 = postService.findPosts(email, 0, "my", "");
+
+        assertThat(response1.postList().getFirst().title()).isEqualTo("함수 네이밍 룰 컨벤션");
+        assertThat(response2.postList().getFirst().title()).isEqualTo("함수 네이밍 룰 컨벤션");
+    }
+
     private PostAddRequest createPostAddRequest(String title, String content, String link, String categoryName) {
         return new PostAddRequest(title, content, link, categoryName);
     }
@@ -283,5 +338,9 @@ class PostServiceTest {
 
     private Subscribe createSubscribe(User user, Post post) {
         return new Subscribe(user, post);
+    }
+
+    private Page<Post> createPostPage(User user) {
+        return new PageImpl<>(List.of(createPost(user)));
     }
 }
